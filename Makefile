@@ -2,13 +2,14 @@
 PROJECT_NAME := bb6502emu
 
 # Commands
-CC := gcc -c
+CC := gcc
 LD := gcc
-MKDIR := mkdir
+MKDIR := mkdir -p
 RM := rm
+ECHO := echo
 
 # Compiler configuration
-CFLAGS := -W -Wall -Wextra -O0 -g3 -std=gnu99 -pedantic -Iinclude -MP -MMD
+CFLAGS := -W -Wall -Wextra -O0 -g3 -std=gnu17 -pedantic -Iinclude -MP -MMD -c
 LDFLAGS := -W -Wall -Wextra -O0 -g3
 
 # Automatic generation of code
@@ -20,16 +21,26 @@ EXECUTABLE_NAME := $(PROJECT_NAME).elf
 
 all: bin/$(EXECUTABLE_NAME)
 
-bin/$(EXECUTABLE_NAME): $(OBJECTS_C) dirs
-	$(LD) $(OBJECTS_C) $(LDFLAGS) -o $@
+bin/$(EXECUTABLE_NAME): $(OBJECTS_C)
+	@if [ ! -d bin ]; then \
+		$(ECHO) MKDIR bin; \
+		$(MKDIR) bin; \
+	fi
+	@$(ECHO) LD $@
+	@$(LD) $(OBJECTS_C) $(LDFLAGS) -o $@
 
-obj/%.o: src/%.c dirs
-	$(CC) $(CFLAGS) $< -o $@
+obj/%.o: src/%.c
+	@if [ ! -d $(dir $@) ]; then \
+		$(ECHO) MKDIR $(dir $@); \
+		$(MKDIR) $(dir $@); \
+	fi
+	@$(ECHO) C $@
+	@$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	$(RM) -rf bin obj
+	@$(ECHO) RM bin obj
+	@$(RM) -rf bin obj
 
-dirs:
-	$(MKDIR) -p $(DIRS)
+.PHONY: all clean
 
-.PHONY: all clean dirs
+-include $(OBJECTS_C:%.o=%.d)
