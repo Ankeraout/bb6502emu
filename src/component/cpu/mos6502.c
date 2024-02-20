@@ -664,6 +664,151 @@ static void mos6502_step(struct ts_cpu *p_cpu) {
                 l_cpu->m_regA
             );
             break;
+
+        case 0xa0: // LDY immediate
+            l_cpu->m_regY = mos6502_fetch8(l_cpu);
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xa1: // LDA indexed indirect
+            l_cpu->m_regA = busRead(
+                l_cpu->m_bus,
+                mos6502_getIndexedIndirect(l_cpu)
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xa2: // LDX immediate
+            l_cpu->m_regX = mos6502_fetch8(l_cpu);
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xa4: // LDY zero-page
+            l_cpu->m_regY = busRead(l_cpu->m_bus, mos6502_fetch8(l_cpu));
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xa5: // LDA zero-page
+            l_cpu->m_regA = busRead(l_cpu->m_bus, mos6502_fetch8(l_cpu));
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xa6: // LDX zero-page
+            l_cpu->m_regX = busRead(l_cpu->m_bus, mos6502_fetch8(l_cpu));
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xa8: // TAY
+            l_cpu->m_regY = l_cpu->m_regA;
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xa9: // LDA immediate
+            l_cpu->m_regA = mos6502_fetch8(l_cpu);
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xaa: // TAX
+            l_cpu->m_regX = l_cpu->m_regA;
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xac: // LDY absolute
+            l_cpu->m_regY = busRead(l_cpu->m_bus, mos6502_fetch16(l_cpu));
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xad: // LDA absolute
+            l_cpu->m_regA = busRead(l_cpu->m_bus, mos6502_fetch16(l_cpu));
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xae: // LDX absolute
+            l_cpu->m_regX = busRead(l_cpu->m_bus, mos6502_fetch16(l_cpu));
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xb0: // BCS relative
+            if(l_cpu->m_flagC) {
+                l_cpu->m_regPC += (int8_t)mos6502_fetch8(l_cpu);
+            }
+
+            break;
+
+        case 0xb1: // LDA indirect indexed
+            l_cpu->m_regA = busRead(
+                l_cpu->m_bus,
+                mos6502_getIndirectIndexed(l_cpu)
+            );
+
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xb4: // LDY X-indexed zero-page
+            l_cpu->m_regY = busRead(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu) + l_cpu->m_regX
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xb5: // LDA X-indexed zero-page
+            l_cpu->m_regA = busRead(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu) + l_cpu->m_regX
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xb6: // LDX Y-indexed zero-page
+            l_cpu->m_regX = busRead(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu) + l_cpu->m_regY
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xb8: // CLV
+            l_cpu->m_flagV = false;
+            break;
+
+        case 0xb9: // LDA absolute Y-indexed
+            l_cpu->m_regA = busRead(
+                l_cpu->m_bus,
+                mos6502_fetch16(l_cpu) + l_cpu->m_regY
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xba: // TSX
+            l_cpu->m_regX = l_cpu->m_regSP;
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xbc: // LDY absolute X-indexed
+            l_cpu->m_regY = busRead(
+                l_cpu->m_bus,
+                mos6502_fetch16(l_cpu) + l_cpu->m_regX
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xbd: // LDA absolute X-indexed
+            l_cpu->m_regA = busRead(
+                l_cpu->m_bus,
+                mos6502_fetch16(l_cpu) + l_cpu->m_regX
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xbe: // LDX absolute Y-indexed
+            l_cpu->m_regX = busRead(
+                l_cpu->m_bus,
+                mos6502_fetch16(l_cpu) + l_cpu->m_regY
+            );
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
     }
 }
 
