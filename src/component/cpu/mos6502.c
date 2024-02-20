@@ -34,6 +34,13 @@ static inline void mos6502_eor(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 static inline uint8_t mos6502_lsr(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 static inline void mos6502_adc(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 static inline uint8_t mos6502_ror(struct ts_mos6502 *p_cpu, uint8_t p_operand);
+static inline void mos6502_cmp(
+    struct ts_mos6502 *p_cpu,
+    uint8_t p_operand1,
+    uint8_t p_operand2
+);
+static inline uint8_t mos6502_dec(struct ts_mos6502 *p_cpu, uint8_t p_operand);
+static inline uint8_t mos6502_inc(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 
 void mos6502_init(struct ts_mos6502 *p_mos6502, struct ts_bus *p_bus) {
     memset(p_mos6502, 0, sizeof(struct ts_mos6502));
@@ -809,6 +816,128 @@ static void mos6502_step(struct ts_cpu *p_cpu) {
             mos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
             break;
 
+        case 0xc0: // CPY immediate
+            mos6502_cmp(l_cpu, l_cpu->m_regY, mos6502_fetch8(l_cpu));
+            break;
+
+        case 0xc1: // CMP indexed indirect
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regA,
+                mos6502_getIndexedIndirect(l_cpu)
+            );
+            break;
+
+        case 0xc4: // CPY zero-page
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regY,
+                busRead(l_cpu->m_bus, mos6502_fetch8(l_cpu))
+            );
+            break;
+
+        case 0xc5: // CMP zero-page
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regA,
+                busRead(l_cpu->m_bus, mos6502_fetch8(l_cpu))
+            );
+            break;
+
+        case 0xc6: // DEC zero-page
+            l_tmpAddress = mos6502_fetch8(l_cpu);
+            l_tmpData = mos6502_dec(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0xc8: // INY
+            l_cpu->m_regY = mos6502_inc(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xc9: // CMP immediate
+            mos6502_cmp(l_cpu, l_cpu->m_regA, mos6502_fetch8(l_cpu));
+            break;
+
+        case 0xca: // DEX
+            l_cpu->m_regX = mos6502_dec(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xcc: // CPY absolute
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regY, 
+                mos6502_read16(l_cpu, mos6502_fetch16(l_cpu))
+            );
+            break;
+
+        case 0xcd: // CMP absolute
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regA, 
+                mos6502_read16(l_cpu, mos6502_fetch16(l_cpu))
+            );
+            break;
+
+        case 0xce: // DEC absolute
+            l_tmpAddress = mos6502_fetch16(l_cpu);
+            l_tmpData = mos6502_dec(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0xd0: // BNE rel
+            if(!l_cpu->m_flagZ) {
+                l_cpu->m_regPC += (int8_t)mos6502_fetch8(l_cpu);
+            }
+
+            break;
+
+        case 0xd1: // CMP indirect indexed
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regA,
+                busRead(l_cpu->m_bus, mos6502_getIndirectIndexed(l_cpu))
+            );
+            break;
+
+        case 0xd5: // CMP X-indexed zero-page
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regA,
+                busRead(l_cpu->m_bus, mos6502_fetch8(l_cpu) + l_cpu->m_regX)
+            );
+            break;
+
+        case 0xd6: // DEC X-indexed zero-page
+            l_tmpAddress = mos6502_fetch8(l_cpu) + l_cpu->m_regX;
+            l_tmpData = mos6502_dec(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0xd8: // CLD
+            l_cpu->m_flagD = false;
+            break;
+
+        case 0xd9: // CMP Y-indexed absolute
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regA,
+                busRead(l_cpu->m_bus, mos6502_fetch16(l_cpu) + l_cpu->m_regY)
+            );
+            break;
+
+        case 0xdd: // CMP X-indexed absolute
+            mos6502_cmp(
+                l_cpu,
+                l_cpu->m_regA,
+                busRead(l_cpu->m_bus, mos6502_fetch16(l_cpu) + l_cpu->m_regX)
+            );
+            break;
+
+        case 0xde: // DEC X-indexed absolute
+            l_tmpAddress = mos6502_fetch16(l_cpu) + l_cpu->m_regX;
+            l_tmpData = mos6502_dec(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
     }
 }
 
@@ -985,6 +1114,34 @@ static inline uint8_t mos6502_ror(struct ts_mos6502 *p_cpu, uint8_t p_operand) {
     if(l_tmpFlag) {
         p_operand |= 1 << 7;
     }
+
+    mos6502_setFlagsLogical(p_cpu, p_operand);
+
+    return p_operand;
+}
+
+static inline void mos6502_cmp(
+    struct ts_mos6502 *p_cpu,
+    uint8_t p_operand1,
+    uint8_t p_operand2
+) {
+    uint8_t l_result = p_operand1 - p_operand2;
+
+    p_cpu->m_flagC = p_operand1 >= p_operand2;
+
+    mos6502_setFlagsLogical(p_cpu, l_result);
+}
+
+static inline uint8_t mos6502_dec(struct ts_mos6502 *p_cpu, uint8_t p_operand) {
+    p_operand--;
+
+    mos6502_setFlagsLogical(p_cpu, p_operand);
+
+    return p_operand;
+}
+
+static inline uint8_t mos6502_inc(struct ts_mos6502 *p_cpu, uint8_t p_operand) {
+    p_operand++;
 
     mos6502_setFlagsLogical(p_cpu, p_operand);
 
