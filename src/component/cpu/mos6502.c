@@ -550,6 +550,120 @@ static void mos6502_step(struct ts_cpu *p_cpu) {
             l_tmpData = mos6502_ror(l_cpu, l_tmpData);
             busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
             break;
+
+        case 0x81: // STA indexed indirect
+            l_cpu->m_bus->m_write(
+                l_cpu->m_bus,
+                mos6502_getIndexedIndirect(l_cpu),
+                l_cpu->m_regA
+            );
+            break;
+
+        case 0x84: // STY zero-page
+            l_cpu->m_bus->m_write(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu),
+                l_cpu->m_regY
+            );
+            break;
+
+        case 0x85: // STA zero-page
+            l_cpu->m_bus->m_write(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu),
+                l_cpu->m_regA
+            );
+            break;
+
+        case 0x86: // STX zero-page
+            busWrite(l_cpu->m_bus, mos6502_fetch8(l_cpu), l_cpu->m_regX);
+            break;
+
+        case 0x88: // DEY
+            l_cpu->m_regY--;
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0x8a: // TXA
+            l_cpu->m_regA = l_cpu->m_regX;
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0x8c: // STY absolute
+            busWrite(l_cpu->m_bus, mos6502_fetch16(l_cpu), l_cpu->m_regY);
+            break;
+
+        case 0x8d: // STA absolute
+            busWrite(l_cpu->m_bus, mos6502_fetch16(l_cpu), l_cpu->m_regA);
+            break;
+
+        case 0x8e: // STX absolute
+            busWrite(l_cpu->m_bus, mos6502_fetch16(l_cpu), l_cpu->m_regX);
+            break;
+
+        case 0x90: // BCC relative
+            if(!l_cpu->m_flagC) {
+                l_cpu->m_regPC += (int8_t)mos6502_fetch8(l_cpu);
+            }
+
+            break;
+
+        case 0x91: // STA indirect indexed
+            busWrite(
+                l_cpu->m_bus,
+                mos6502_getIndirectIndexed(l_cpu),
+                l_cpu->m_regA
+            );
+            break;
+
+        case 0x94: // STY X-indexed zero-page
+            busWrite(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu) + l_cpu->m_regX,
+                l_cpu->m_regY
+            );
+            break;
+
+        case 0x95: // STA X-indexed zero-page
+            busWrite(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu) + l_cpu->m_regX,
+                l_cpu->m_regA
+            );
+            break;
+
+        case 0x96: // STX Y-indexed zero-page
+            busWrite(
+                l_cpu->m_bus,
+                mos6502_fetch8(l_cpu) + l_cpu->m_regY,
+                l_cpu->m_regX
+            );
+            break;
+
+        case 0x98: // TYA
+            l_cpu->m_regA = l_cpu->m_regY;
+            mos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0x99: // STA absolute Y-indexed
+            busWrite(
+                l_cpu->m_bus,
+                mos6502_fetch16(l_cpu) + l_cpu->m_regY,
+                l_cpu->m_regA
+            );
+            break;
+
+        case 0x9a: // TXS
+            l_cpu->m_regSP = l_cpu->m_regX;
+            break;
+
+        case 0x9d: // STA absolute X-indexed
+            busWrite(
+                l_cpu->m_bus,
+                mos6502_fetch16(l_cpu) + l_cpu->m_regX,
+                l_cpu->m_regA
+            );
+            break;
     }
 }
 
