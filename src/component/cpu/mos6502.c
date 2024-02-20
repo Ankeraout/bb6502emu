@@ -32,6 +32,8 @@ static inline void mos6502_bit(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 static inline uint8_t mos6502_rol(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 static inline void mos6502_eor(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 static inline uint8_t mos6502_lsr(struct ts_mos6502 *p_cpu, uint8_t p_operand);
+static inline void mos6502_adc(struct ts_mos6502 *p_cpu, uint8_t p_operand);
+static inline uint8_t mos6502_ror(struct ts_mos6502 *p_cpu, uint8_t p_operand);
 
 void mos6502_init(struct ts_mos6502 *p_mos6502, struct ts_bus *p_bus) {
     memset(p_mos6502, 0, sizeof(struct ts_mos6502));
@@ -437,6 +439,116 @@ static void mos6502_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x61: // ADC indexed indirect
+            mos6502_adc(
+                l_cpu,
+                busRead(
+                    l_cpu->m_bus,
+                    mos6502_getIndexedIndirect(l_cpu)
+                )
+            );
+            break;
+
+        case 0x65: // ADC zero-page
+            mos6502_adc(l_cpu, busRead(l_cpu->m_bus, mos6502_fetch8(l_cpu)));
+            break;
+
+        case 0x66: // ROR zero-page
+            l_tmpAddress = mos6502_fetch8(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = mos6502_ror(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x68: // PLA
+            l_cpu->m_regA = busRead(l_cpu->m_bus, ++l_cpu->m_regSP | 0x100);
+            break;
+
+        case 0x69: // ADC immediate
+            mos6502_adc(l_cpu, mos6502_fetch8(l_cpu));
+            break;
+
+        case 0x6a: // ROR A
+            mos6502_ror(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0x6c: // JMP indirect
+            l_cpu->m_regPC = mos6502_read16(l_cpu, mos6502_fetch16(l_cpu));
+            break;
+
+        case 0x6d: // ADC absolute
+            mos6502_adc(l_cpu, busRead(l_cpu->m_bus, mos6502_fetch16(l_cpu)));
+            break;
+
+        case 0x6e: // ROR absolute
+            l_tmpAddress = mos6502_fetch16(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = mos6502_ror(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x70: // BVS relative
+            if(l_cpu->m_flagV) {
+                l_cpu->m_regPC += (int8_t)mos6502_fetch8(l_cpu);
+            }
+
+            break;
+
+        case 0x71: // ADC indirect indexed
+            mos6502_adc(
+                l_cpu,
+                busRead(
+                    l_cpu->m_bus,
+                    mos6502_getIndirectIndexed(l_cpu)
+                )
+            );
+            break;
+
+        case 0x75: // ADC X-indexed zero-page
+            mos6502_adc(
+                l_cpu,
+                busRead(
+                    l_cpu->m_bus,
+                    mos6502_fetch8(l_cpu) + l_cpu->m_regX
+                )
+            );
+            break;
+
+        case 0x76: // ROR X-indexed zero-page
+            l_tmpAddress = mos6502_fetch8(l_cpu) + l_cpu->m_regX;
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = mos6502_ror(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x78: // SEI
+            l_cpu->m_flagI = true;
+            break;
+
+        case 0x79: // ADC absolute, Y-indexed
+            mos6502_adc(
+                l_cpu,
+                busRead(
+                    l_cpu->m_bus,
+                    mos6502_fetch16(l_cpu) + l_cpu->m_regY
+                )
+            );
+            break;
+
+        case 0x7d: // ADC absolute, X-indexed
+            mos6502_adc(
+                l_cpu,
+                busRead(
+                    l_cpu->m_bus,
+                    mos6502_fetch16(l_cpu) + l_cpu->m_regX
+                )
+            );
+            break;
+
+        case 0x7e: // ROR absolute, X-indexed
+            l_tmpAddress = mos6502_fetch16(l_cpu) + l_cpu->m_regX;
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = mos6502_ror(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
             break;
     }
 }
@@ -585,6 +697,36 @@ static inline void mos6502_eor(struct ts_mos6502 *p_cpu, uint8_t p_operand) {
 static inline uint8_t mos6502_lsr(struct ts_mos6502 *p_cpu, uint8_t p_operand) {
     p_cpu->m_flagC = (p_operand & (1 << 0)) != 0;
     p_operand >>= 1;
+    mos6502_setFlagsLogical(p_cpu, p_operand);
+
+    return p_operand;
+}
+
+static inline void mos6502_adc(struct ts_mos6502 *p_cpu, uint8_t p_operand) {
+    uint8_t l_tmp = p_cpu->m_regA;
+
+    p_cpu->m_regA += p_operand;
+    
+    if(p_cpu->m_flagC) {
+        p_cpu->m_regA++;
+    }
+
+    mos6502_setFlagsLogical(p_cpu, p_cpu->m_regA);
+    p_cpu->m_flagV =
+        (((l_tmp ^ p_operand) | (l_tmp ^ p_cpu->m_regA)) & (1 << 7)) != 0;
+    p_cpu->m_flagC =
+        l_tmp + p_operand + (p_cpu->m_flagC ? 1 : 0) >= 0x100;    
+}
+
+static inline uint8_t mos6502_ror(struct ts_mos6502 *p_cpu, uint8_t p_operand) {
+    bool l_tmpFlag = p_cpu->m_flagC;
+    p_cpu->m_flagC = (p_operand & (1 << 0)) != 0;
+    p_operand >>= 1;
+
+    if(l_tmpFlag) {
+        p_operand |= 1 << 7;
+    }
+
     mos6502_setFlagsLogical(p_cpu, p_operand);
 
     return p_operand;
