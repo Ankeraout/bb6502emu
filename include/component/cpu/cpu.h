@@ -3,6 +3,7 @@
 
 struct ts_cpu {
     void (*m_step)(struct ts_cpu *p_cpu);
+    void (*m_reset)(struct ts_cpu *p_cpu);
 };
 
 #endif
