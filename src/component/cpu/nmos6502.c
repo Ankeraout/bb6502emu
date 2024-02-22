@@ -27,6 +27,19 @@ static inline void nmos6502_setFlagsLogical(
 );
 static inline uint8_t nmos6502_getP(struct ts_nmos6502 *p_cpu);
 static inline void nmos6502_setP(struct ts_nmos6502 *p_cpu, uint8_t p_value);
+static inline uint16_t nmos6502_getAddressXIndexedIndirect(
+    struct ts_nmos6502 *p_cpu
+);
+static inline uint16_t nmos6502_getAddressZeroPage(struct ts_nmos6502 *p_cpu);
+static inline uint16_t nmos6502_getAddressAbsolute(struct ts_nmos6502 *p_cpu);
+static inline void nmos6502_opcodeOra(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+);
+static inline uint8_t nmos6502_opcodeAsl(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+);
 
 void nmos6502_init(struct ts_nmos6502 *p_nmos6502, struct ts_bus *p_bus) {
     memset(p_nmos6502, 0, sizeof(struct ts_nmos6502));
@@ -54,8 +67,57 @@ static void nmos6502_step(struct ts_cpu *p_cpu) {
 
     uint8_t l_opcode = nmos6502_fetch8(l_cpu);
 
-    switch(l_opcode) {
+    uint16_t l_tmpAddress;
+    uint8_t l_tmpData;
 
+    switch(l_opcode) {
+        case 0x00: // BRK
+            nmos6502_interrupt(l_cpu, 0xfffe, true);
+            break;
+
+        case 0x01: // ORA X-indexed, indirect
+            nmos6502_opcodeOra(
+                l_cpu,
+                nmos6502_getAddressXIndexedIndirect(l_cpu)
+            );
+            break;
+
+        case 0x05: // ORA Zero-page
+            nmos6502_opcodeOra(l_cpu, nmos6502_getAddressZeroPage(l_cpu));
+            break;
+
+        case 0x06: // ASL Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeAsl(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x08: // PHP Implied
+            nmos6502_push8(l_cpu, nmos6502_getP(l_cpu));
+            break;
+
+        case 0x09: // ORA Immediate
+            nmos6502_opcodeOra(l_cpu, nmos6502_fetch8(l_cpu));
+            break;
+
+        case 0x0a: // ASL A
+            l_cpu->m_regA = nmos6502_opcodeAsl(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0x0d: // ORA Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeAsl(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x0e: // ASL Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeAsl(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
     }
 }
 
@@ -63,9 +125,7 @@ static void nmos6502_reset(struct ts_cpu *p_cpu) {
     struct ts_nmos6502 *l_nmos6502 = (struct ts_nmos6502 *)p_cpu;
 
     l_nmos6502->m_regSP = 0xff;
-    l_nmos6502->m_regPC = l_nmos6502->m_bus->m_read(l_nmos6502->m_bus, 0x01fd);
-    l_nmos6502->m_regPC |=
-        l_nmos6502->m_bus->m_read(l_nmos6502->m_bus, 0x1fc) << 8;
+    l_nmos6502->m_regPC = nmos6502_read16(l_nmos6502, 0xfffc);
     l_nmos6502->m_flagI = true;
     l_nmos6502->m_flagD = false;
 }
@@ -161,4 +221,37 @@ static inline void nmos6502_setP(struct ts_nmos6502 *p_cpu, uint8_t p_value) {
     p_cpu->m_flagI = (p_value & (1 << 2)) != 0;
     p_cpu->m_flagZ = (p_value & (1 << 1)) != 0;
     p_cpu->m_flagC = (p_value & (1 << 0)) != 0;
+}
+
+static inline uint16_t nmos6502_getAddressXIndexedIndirect(
+    struct ts_nmos6502 *p_cpu
+) {
+    return nmos6502_read16(p_cpu, nmos6502_fetch8(p_cpu) + p_cpu->m_regX);
+}
+
+static inline uint16_t nmos6502_getAddressZeroPage(struct ts_nmos6502 *p_cpu) {
+    return nmos6502_fetch8(p_cpu);
+}
+
+static inline uint16_t nmos6502_getAddressAbsolute(struct ts_nmos6502 *p_cpu) {
+    return nmos6502_fetch16(p_cpu);
+}
+
+static inline void nmos6502_opcodeOra(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+) {
+    p_cpu->m_regA |= p_operand;
+    nmos6502_setFlagsLogical(p_cpu, p_cpu->m_regA);
+}
+
+static inline uint8_t nmos6502_opcodeAsl(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+) {
+    p_cpu->m_flagC = (p_operand & (1 << 7)) != 0;
+    p_operand <<= 1;
+    nmos6502_setFlagsLogical(p_cpu, p_operand);
+
+    return p_operand;
 }
