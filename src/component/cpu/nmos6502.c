@@ -57,6 +57,18 @@ static inline void nmos6502_opcodeBranch(
     struct ts_nmos6502 *p_cpu,
     bool p_condition
 );
+static inline void nmos6502_opcodeAnd(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+);
+static inline void nmos6502_opcodeBit(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+);
+static inline uint8_t nmos6502_opcodeRol(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+);
 
 void nmos6502_init(struct ts_nmos6502 *p_nmos6502, struct ts_bus *p_bus) {
     memset(p_nmos6502, 0, sizeof(struct ts_nmos6502));
@@ -174,6 +186,99 @@ static void nmos6502_step(struct ts_cpu *p_cpu) {
             l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
             l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
             l_tmpData = nmos6502_opcodeAsl(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x20: // AND X-indexed, indirect
+            l_tmpAddress = nmos6502_getAddressXIndexedIndirect(l_cpu);
+            nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x24: // BIT Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            nmos6502_opcodeBit(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x25: // AND Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x26: // ROL Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeRol(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x28: // PLP
+            nmos6502_setP(l_cpu, nmos6502_pop8(l_cpu));
+            break;
+
+        case 0x29: // AND Immediate
+            nmos6502_opcodeAnd(l_cpu, nmos6502_fetch8(l_cpu));
+            break;
+
+        case 0x2a: // ROL A
+            l_cpu->m_regA = nmos6502_opcodeRol(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0x2c: // BIT Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            nmos6502_opcodeBit(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x2d: // AND Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x2e: // ROL Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeRol(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x30: // BMI Relative
+            nmos6502_opcodeBranch(l_cpu, l_cpu->m_flagN);
+            break;
+
+        case 0x31: // AND Indirect, Y-indexed
+            l_tmpAddress = nmos6502_getAddressIndirectYIndexed(l_cpu);
+            nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x35: // AND Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x36: // ROL Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeRol(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x38: // SEC Implied
+            l_cpu->m_flagC = true;
+            break;
+
+        case 0x39: // AND Absolute, Y-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteYIndexed(l_cpu);
+            nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x3d: // AND Absolute, X-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
+            nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x3e: // ROL Absolute, X-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeRol(l_cpu, l_tmpData);
             busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
             break;
     }
@@ -385,4 +490,40 @@ static inline void nmos6502_opcodeBranch(
 
     // TODO: delay if page change?
     // TODO: delay if condition is true?
+}
+
+static inline void nmos6502_opcodeAnd(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+) {
+    p_cpu->m_regA &= p_operand;
+    nmos6502_setFlagsLogical(p_cpu, p_cpu->m_regA);
+}
+
+static inline void nmos6502_opcodeBit(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+) {
+    uint8_t l_result = p_cpu->m_regA & p_operand;
+
+    p_cpu->m_flagN = (p_operand & (1 << 7)) != 0;
+    p_cpu->m_flagZ = l_result == 0;
+    p_cpu->m_flagV = (p_operand & (1 << 6)) != 0;
+}
+
+static inline uint8_t nmos6502_opcodeRol(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+) {
+    bool l_tmpFlag = p_cpu->m_flagC;
+    p_cpu->m_flagC = (p_operand & (1 << 7)) != 0;
+    p_operand <<= 1;
+
+    if(l_tmpFlag) {
+        p_operand |= 1;
+    }
+
+    nmos6502_setFlagsLogical(p_cpu, p_operand);
+
+    return p_operand;
 }
