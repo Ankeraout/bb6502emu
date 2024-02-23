@@ -32,6 +32,19 @@ static inline uint16_t nmos6502_getAddressXIndexedIndirect(
 );
 static inline uint16_t nmos6502_getAddressZeroPage(struct ts_nmos6502 *p_cpu);
 static inline uint16_t nmos6502_getAddressAbsolute(struct ts_nmos6502 *p_cpu);
+static inline uint16_t nmos6502_getAddressRelative(struct ts_nmos6502 *p_cpu);
+static inline uint16_t nmos6502_getAddressIndirectYIndexed(
+    struct ts_nmos6502 *p_cpu
+);
+static inline uint16_t nmos6502_getAddressZeroPageXIndexed(
+    struct ts_nmos6502 *p_cpu
+);
+static inline uint16_t nmos6502_getAddressAbsoluteYIndexed(
+    struct ts_nmos6502 *p_cpu
+);
+static inline uint16_t nmos6502_getAddressAbsoluteXIndexed(
+    struct ts_nmos6502 *p_cpu
+);
 static inline void nmos6502_opcodeOra(
     struct ts_nmos6502 *p_cpu,
     uint8_t p_operand
@@ -39,6 +52,10 @@ static inline void nmos6502_opcodeOra(
 static inline uint8_t nmos6502_opcodeAsl(
     struct ts_nmos6502 *p_cpu,
     uint8_t p_operand
+);
+static inline void nmos6502_opcodeBranch(
+    struct ts_nmos6502 *p_cpu,
+    bool p_condition
 );
 
 void nmos6502_init(struct ts_nmos6502 *p_nmos6502, struct ts_bus *p_bus) {
@@ -83,7 +100,8 @@ static void nmos6502_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x05: // ORA Zero-page
-            nmos6502_opcodeOra(l_cpu, nmos6502_getAddressZeroPage(l_cpu));
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            nmos6502_opcodeOra(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
             break;
 
         case 0x06: // ASL Zero-page
@@ -107,13 +125,53 @@ static void nmos6502_step(struct ts_cpu *p_cpu) {
 
         case 0x0d: // ORA Absolute
             l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            nmos6502_opcodeOra(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x0e: // ASL Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
             l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
             l_tmpData = nmos6502_opcodeAsl(l_cpu, l_tmpData);
             busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
             break;
 
-        case 0x0e: // ASL Absolute
-            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+        case 0x10: // BPL Relative
+            nmos6502_opcodeBranch(l_cpu, l_cpu->m_flagN);
+            break;
+
+        case 0x11: // ORA Indirect, Y-indexed
+            l_tmpAddress = nmos6502_getAddressIndirectYIndexed(l_cpu);
+            nmos6502_opcodeOra(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x15: // ORA Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            nmos6502_opcodeOra(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x16: // ASL Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeAsl(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
+        case 0x18: // CLC Implied
+            l_cpu->m_flagC = false;
+            break;
+        
+        case 0x19: // ORA Absolute, Y-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteYIndexed(l_cpu);
+            nmos6502_opcodeOra(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x1d: // ORA Absolute, X-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
+            nmos6502_opcodeOra(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x1e: // ASL Absolute, X-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
             l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
             l_tmpData = nmos6502_opcodeAsl(l_cpu, l_tmpData);
             busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
@@ -226,7 +284,12 @@ static inline void nmos6502_setP(struct ts_nmos6502 *p_cpu, uint8_t p_value) {
 static inline uint16_t nmos6502_getAddressXIndexedIndirect(
     struct ts_nmos6502 *p_cpu
 ) {
-    return nmos6502_read16(p_cpu, nmos6502_fetch8(p_cpu) + p_cpu->m_regX);
+    uint16_t l_address = (nmos6502_fetch8(p_cpu) + p_cpu->m_regX) & 0x00ff;
+
+    uint8_t l_low = busRead(p_cpu->m_bus, l_address);
+    uint8_t l_high = busRead(p_cpu->m_bus, (l_address + 1) & 0x00ff);
+
+    return (l_high << 8) | l_low;
 }
 
 static inline uint16_t nmos6502_getAddressZeroPage(struct ts_nmos6502 *p_cpu) {
@@ -235,6 +298,62 @@ static inline uint16_t nmos6502_getAddressZeroPage(struct ts_nmos6502 *p_cpu) {
 
 static inline uint16_t nmos6502_getAddressAbsolute(struct ts_nmos6502 *p_cpu) {
     return nmos6502_fetch16(p_cpu);
+}
+
+static inline uint16_t nmos6502_getAddressRelative(struct ts_nmos6502 *p_cpu) {
+    int8_t l_offset = nmos6502_fetch8(p_cpu);
+    uint16_t l_finalAddress = p_cpu->m_regPC + l_offset;
+
+    if((p_cpu->m_regPC >> 8) != (l_finalAddress >> 8)) {
+        busCycle(p_cpu->m_bus);
+    }
+
+    return l_finalAddress;
+}
+
+static inline uint16_t nmos6502_getAddressIndirectYIndexed(
+    struct ts_nmos6502 *p_cpu
+) {
+    uint16_t l_address = nmos6502_fetch8(p_cpu);
+
+    uint8_t l_low = busRead(p_cpu->m_bus, l_address);
+    uint8_t l_high = busRead(p_cpu->m_bus, (l_address + 1) & 0x00ff);
+
+    l_address = (l_high << 8) | l_low;
+
+    return l_address + p_cpu->m_regY;
+}
+
+static inline uint16_t nmos6502_getAddressZeroPageXIndexed(
+    struct ts_nmos6502 *p_cpu
+) {
+    return (nmos6502_fetch8(p_cpu) + p_cpu->m_regX) & 0x00ff;
+}
+
+static inline uint16_t nmos6502_getAddressAbsoluteYIndexed(
+    struct ts_nmos6502 *p_cpu
+) {
+    uint16_t l_address = nmos6502_fetch16(p_cpu);
+    uint16_t l_finalAddress = l_address + p_cpu->m_regY;
+
+    if((l_address >> 8) != (l_finalAddress >> 8)) {
+        busCycle(p_cpu->m_bus);
+    }
+
+    return l_finalAddress;
+}
+
+static inline uint16_t nmos6502_getAddressAbsoluteXIndexed(
+    struct ts_nmos6502 *p_cpu
+) {
+    uint16_t l_address = nmos6502_fetch16(p_cpu);
+    uint16_t l_finalAddress = l_address + p_cpu->m_regX;
+
+    if((l_address >> 8) != (l_finalAddress >> 8)) {
+        busCycle(p_cpu->m_bus);
+    }
+
+    return l_finalAddress;
 }
 
 static inline void nmos6502_opcodeOra(
@@ -254,4 +373,16 @@ static inline uint8_t nmos6502_opcodeAsl(
     nmos6502_setFlagsLogical(p_cpu, p_operand);
 
     return p_operand;
+}
+
+static inline void nmos6502_opcodeBranch(
+    struct ts_nmos6502 *p_cpu,
+    bool p_condition
+) {
+    if(p_condition) {
+        p_cpu->m_regPC += (int8_t)nmos6502_fetch8(p_cpu);
+    }
+
+    // TODO: delay if page change?
+    // TODO: delay if condition is true?
 }
