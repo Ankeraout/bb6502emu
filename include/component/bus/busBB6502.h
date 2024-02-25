@@ -2,7 +2,19 @@
 #define __INCLUDE_COMPONENT_BUS_BUSBB6502_H__
 
 #include "component/bus/bus.h"
+#include "component/ram/ram32k.h"
+#include "component/rom/rom32k.h"
 
-void busBB6502_init(struct ts_bus *p_bus);
+struct ts_busBB6502 {
+    struct ts_bus m_bus;
+    struct ts_rom32k *m_rom;
+    struct ts_ram32k *m_ram;
+};
+
+void busBB6502_init(
+    struct ts_busBB6502 *p_bus,
+    struct ts_rom32k *p_rom,
+    struct ts_ram32k *p_ram
+);
 
 #endif

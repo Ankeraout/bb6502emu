@@ -1138,8 +1138,10 @@ static inline void nmos6502_opcodeBranch(
     struct ts_nmos6502 *p_cpu,
     bool p_condition
 ) {
+    int8_t l_offset = nmos6502_fetch8(p_cpu);
+
     if(p_condition) {
-        p_cpu->m_regPC += (int8_t)nmos6502_fetch8(p_cpu);
+        p_cpu->m_regPC += l_offset;
     }
 
     // TODO: delay if page change?
