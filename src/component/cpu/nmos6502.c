@@ -352,6 +352,22 @@ static void nmos6502_step(struct ts_cpu *p_cpu) {
             l_cpu->m_regA = nmos6502_opcodeLsr(l_cpu, l_cpu->m_regA);
             break;
 
+        case 0x4c: // JMP Absolute
+            l_cpu->m_regPC = nmos6502_getAddressAbsolute(l_cpu);
+            break;
+
+        case 0x4d: // EOR Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            nmos6502_opcodeEor(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
+            break;
+
+        case 0x4e: // LSR Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            l_tmpData = busRead(l_cpu->m_bus, l_tmpAddress);
+            l_tmpData = nmos6502_opcodeLsr(l_cpu, l_tmpData);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
+            break;
+
         case 0x50: // BVC Relative
             nmos6502_opcodeBranch(l_cpu, !l_cpu->m_flagV);
             break;
