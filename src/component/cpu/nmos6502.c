@@ -45,6 +45,9 @@ static inline uint16_t nmos6502_getAddressAbsoluteYIndexed(
 static inline uint16_t nmos6502_getAddressAbsoluteXIndexed(
     struct ts_nmos6502 *p_cpu
 );
+static inline uint16_t nmos6502_getAddressZeroPageYIndexed(
+    struct ts_nmos6502 *p_cpu
+);
 static inline void nmos6502_opcodeOra(
     struct ts_nmos6502 *p_cpu,
     uint8_t p_operand
@@ -82,6 +85,10 @@ static inline void nmos6502_opcodeAdc(
     uint8_t p_operand
 );
 static inline uint8_t nmos6502_opcodeRor(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+);
+static inline uint8_t nmos6502_opcodeDec(
     struct ts_nmos6502 *p_cpu,
     uint8_t p_operand
 );
@@ -464,6 +471,220 @@ static void nmos6502_step(struct ts_cpu *p_cpu) {
             l_tmpData = nmos6502_opcodeRor(l_cpu, l_tmpData);
             busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
             break;
+
+        case 0x81: // STA X-indexed, indirect
+            l_tmpAddress = nmos6502_getAddressXIndexedIndirect(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regA);
+            break;
+
+        case 0x84: // STY Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regY);
+            break;
+
+        case 0x85: // STA Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regA);
+            break;
+
+        case 0x86: // STX Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regX);
+            break;
+
+        case 0x88: // DEY Implied
+            l_cpu->m_regY = nmos6502_opcodeDec(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0x8a: // TXA Implied
+            l_cpu->m_regA = l_cpu->m_regX;
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0x8c: // STY Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regY);
+            break;
+
+        case 0x8d: // STA Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regA);
+            break;
+
+        case 0x8e: // STX Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regX);
+            break;
+
+        case 0x90: // BCC Relative
+            nmos6502_opcodeBranch(l_cpu, !l_cpu->m_flagC);
+            break;
+
+        case 0x91: // STA Indirect, Y-indexed
+            l_tmpAddress = nmos6502_getAddressIndirectYIndexed(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regA);
+            break;
+
+        case 0x94: // STY Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regY);
+            break;
+
+        case 0x95: // STA Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regA);
+            break;
+
+        case 0x96: // STX Zero-page, Y-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageYIndexed(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regX);
+            break;
+
+        case 0x98: // TYA Implied
+            l_cpu->m_regA = l_cpu->m_regY;
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0x99: // STA Absolute, Y-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteYIndexed(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regA);
+            break;
+
+        case 0x9a: // TXS Implied
+            l_cpu->m_regSP = l_cpu->m_regX;
+            break;
+
+        case 0x9d: // STA Absolute, X-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
+            busWrite(l_cpu->m_bus, l_tmpAddress, l_cpu->m_regA);
+            break;
+
+        case 0xa0: // LDY Immediate
+            l_cpu->m_regY = nmos6502_fetch8(l_cpu);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+        
+        case 0xa1: // LDA X-indexed, indirect
+            l_tmpAddress = nmos6502_getAddressXIndexedIndirect(l_cpu);
+            l_cpu->m_regA = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xa2: // LDX Immediate
+            l_cpu->m_regX = nmos6502_fetch8(l_cpu);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xa4: // LDY Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            l_cpu->m_regY = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xa5: // LDA Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            l_cpu->m_regA = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xa6: // LDX Zero-page
+            l_tmpAddress = nmos6502_getAddressZeroPage(l_cpu);
+            l_cpu->m_regX = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xa8: // TAY Implied
+            l_cpu->m_regY = l_cpu->m_regA;
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xa9: // LDA Immediate
+            l_cpu->m_regA = nmos6502_fetch8(l_cpu);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xaa: // TAX Implied
+            l_cpu->m_regX = l_cpu->m_regA;
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xac: // LDY Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            l_cpu->m_regY = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xad: // LDA Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            l_cpu->m_regA = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xae: // LDX Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            l_cpu->m_regX = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xb0: // BCS Relative
+            nmos6502_opcodeBranch(l_cpu, l_cpu->m_flagC);
+            break;
+
+        case 0xb1: // LDA Indirect, Y-indexed
+            l_tmpAddress = nmos6502_getAddressIndirectYIndexed(l_cpu);
+            l_cpu->m_regA = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xb4: // LDY Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            l_cpu->m_regY = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xb5: // LDA Zero-page, X-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageXIndexed(l_cpu);
+            l_cpu->m_regA = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xb6: // LDX Zero-page, Y-indexed
+            l_tmpAddress = nmos6502_getAddressZeroPageYIndexed(l_cpu);
+            l_cpu->m_regX = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
+
+        case 0xb8: // CLV Implied
+            l_cpu->m_flagV = false;
+            break;
+
+        case 0xb9: // LDA Absolute, Y-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteYIndexed(l_cpu);
+            l_cpu->m_regA = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xba: // TSX Implied
+            l_cpu->m_regX = l_cpu->m_regSP;
+            break;
+
+        case 0xbc: // LDY Absolute, X-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
+            l_cpu->m_regY = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regY);
+            break;
+
+        case 0xbd: // LDA Absolute, X-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteXIndexed(l_cpu);
+            l_cpu->m_regA = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regA);
+            break;
+
+        case 0xbe: // LDX Absolute, Y-indexed
+            l_tmpAddress = nmos6502_getAddressAbsoluteYIndexed(l_cpu);
+            l_cpu->m_regX = busRead(l_cpu->m_bus, l_tmpAddress);
+            nmos6502_setFlagsLogical(l_cpu, l_cpu->m_regX);
+            break;
     }
 }
 
@@ -644,6 +865,12 @@ static inline uint16_t nmos6502_getAddressAbsoluteXIndexed(
     return l_finalAddress;
 }
 
+static inline uint16_t nmos6502_getAddressZeroPageYIndexed(
+    struct ts_nmos6502 *p_cpu
+) {
+    return (nmos6502_fetch8(p_cpu) + p_cpu->m_regY) & 0x00ff;
+}
+
 static inline void nmos6502_opcodeOra(
     struct ts_nmos6502 *p_cpu,
     uint8_t p_operand
@@ -760,6 +987,17 @@ static inline uint8_t nmos6502_opcodeRor(
     if(l_tmpFlag) {
         p_operand |= 1 << 7;
     }
+
+    nmos6502_setFlagsLogical(p_cpu, p_operand);
+
+    return p_operand;
+}
+
+static inline uint8_t nmos6502_opcodeDec(
+    struct ts_nmos6502 *p_cpu,
+    uint8_t p_operand
+) {
+    p_operand--;
 
     nmos6502_setFlagsLogical(p_cpu, p_operand);
 
