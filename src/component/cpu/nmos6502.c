@@ -223,7 +223,13 @@ static void nmos6502_step(struct ts_cpu *p_cpu) {
             busWrite(l_cpu->m_bus, l_tmpAddress, l_tmpData);
             break;
 
-        case 0x20: // AND X-indexed, indirect
+        case 0x20: // JSR Absolute
+            l_tmpAddress = nmos6502_getAddressAbsolute(l_cpu);
+            nmos6502_push16(l_cpu, l_cpu->m_regPC);
+            l_cpu->m_regPC = l_tmpAddress;
+            break;
+
+        case 0x21: // AND X-indexed, indirect
             l_tmpAddress = nmos6502_getAddressXIndexedIndirect(l_cpu);
             nmos6502_opcodeAnd(l_cpu, busRead(l_cpu->m_bus, l_tmpAddress));
             break;
