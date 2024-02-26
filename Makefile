@@ -34,7 +34,7 @@ obj/%.o: src/%.c
 		$(ECHO) MKDIR $(dir $@); \
 		$(MKDIR) $(dir $@); \
 	fi
-	@$(ECHO) C $@
+	@$(ECHO) CC $@
 	@$(CC) $(CFLAGS) $< -o $@
 
 clean:

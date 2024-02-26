@@ -29,12 +29,18 @@ static void busBB6502_cycle(struct ts_bus *p_bus) {
 
 static t_busData busBB6502_read(struct ts_bus *p_bus, t_busAddress p_address) {
     struct ts_busBB6502 *l_bus = (struct ts_busBB6502 *)p_bus;
+
+    uint8_t l_returnValue;
     
     if((p_address & (1 << 15)) == 0) {
-        return ram32k_read(l_bus->m_ram, p_address);
+        l_returnValue = ram32k_read(l_bus->m_ram, p_address);
     } else {
-        return rom32k_read(l_bus->m_rom, p_address);
+        l_returnValue = rom32k_read(l_bus->m_rom, p_address);
     }
+
+    busBB6502_cycle(p_bus);
+
+    return l_returnValue;
 }
 
 static void busBB6502_write(
@@ -47,4 +53,6 @@ static void busBB6502_write(
     if((p_address & (1 << 15)) == 0) {
         ram32k_write(l_bus->m_ram, p_address, p_data);
     }
+
+    busBB6502_cycle(p_bus);
 }
