@@ -5,6 +5,7 @@
 #include "component/cpu/nmos6502.h"
 #include "component/ram/ram32k.h"
 #include "component/rom/rom32k.h"
+#include "component/serial/mos6551.h"
 #include "machine/machine.h"
 
 struct ts_bb6502 {
@@ -13,8 +14,9 @@ struct ts_bb6502 {
     struct ts_nmos6502 m_cpu;
     struct ts_ram32k m_ram;
     struct ts_rom32k m_rom;
+    struct ts_mos6551 m_serial;
 };
 
-void bb6502_init(struct ts_bb6502 *p_machine, const void *p_rom, size_t p_size);
+int bb6502_init(struct ts_bb6502 *p_machine, const void *p_rom, size_t p_size);
 
 #endif

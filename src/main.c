@@ -1,8 +1,12 @@
 #include <stdio.h>
+#include <pthread.h>
 
 #include "machine/bb6502.h"
 
 static int init(struct ts_bb6502 *p_machine);
+static int initSerialThreads(struct ts_bb6502 *p_machine);
+static void *threadConsoleToSerial(void *p_arg);
+static void *threadSerialToConsole(void *p_arg);
 
 int main(void) {
     struct ts_bb6502 l_machine;
@@ -12,20 +16,13 @@ int main(void) {
         return 1;
     }
 
-    printf("Machine initialized successfully.\n");
+    if(initSerialThreads(&l_machine) != 0) {
+        printf("Failed to initialize serial console threads.\n");
+        return 1;
+    }
 
-    for(int l_i = 0; l_i < 150; l_i++) {
-        printf(
-            "%03d: PC=%04x SP=01%02x A=%02x X=%02x Y=%02x\n",
-            l_i,
-            l_machine.m_cpu.m_regPC,
-            l_machine.m_cpu.m_regSP,
-            l_machine.m_cpu.m_regA,
-            l_machine.m_cpu.m_regX,
-            l_machine.m_cpu.m_regY
-        );
-
-        l_machine.m_machine.m_step(&l_machine);
+    while(true) {
+        l_machine.m_machine.m_step(&l_machine.m_machine);
     }
 
     return 0;
@@ -52,4 +49,73 @@ static int init(struct ts_bb6502 *p_machine) {
     bb6502_init(p_machine, l_romData, 32768);
 
     return 0;
+}
+
+static int initSerialThreads(struct ts_bb6502 *p_machine) {
+    pthread_t l_threadConsoleToSerial;
+    pthread_t l_threadSerialToConsole;
+
+    int l_returnValue = pthread_create(
+        &l_threadConsoleToSerial,
+        NULL,
+        threadConsoleToSerial,
+        p_machine
+    );
+
+    if(l_returnValue != 0) {
+        perror("Failed to create console to serial thread");
+        return 1;
+    }
+
+    l_returnValue = pthread_create(
+        &l_threadSerialToConsole,
+        NULL,
+        threadSerialToConsole,
+        p_machine
+    );
+
+    if(l_returnValue != 0) {
+        perror("Failed to create serial to console thread");
+        return 1;
+    }
+
+    return 0;
+}
+
+static void *threadConsoleToSerial(void *p_arg) {
+    struct ts_bb6502 *l_machine = (struct ts_bb6502 *)p_arg;
+
+    while(true) {
+        int l_input = getchar();
+
+        if(l_input == EOF) {
+            break;
+        }
+
+        l_machine->m_serial.m_serial.m_write(
+            &l_machine->m_serial.m_serial,
+            (const uint8_t *)&l_input,
+            1
+        );
+    }
+
+    return NULL;
+}
+
+static void *threadSerialToConsole(void *p_arg) {
+    struct ts_bb6502 *l_machine = (struct ts_bb6502 *)p_arg;
+
+    while(true) {
+        uint8_t l_buffer;
+
+        l_machine->m_serial.m_serial.m_read(
+            &l_machine->m_serial.m_serial,
+            &l_buffer,
+            1
+        );
+
+        putchar(l_buffer);
+    }
+
+    return NULL;
 }
