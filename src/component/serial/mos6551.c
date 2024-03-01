@@ -40,13 +40,13 @@ static int mos6551_send(struct ts_serial *p_serial, uint8_t p_data) {
     struct ts_mos6551 *l_mos6551 = (struct ts_mos6551 *)p_serial;
     int l_returnValue;
 
-    if(l_mos6551->m_regStatus & C_FLAG_STATUS_TX_EMPTY) {
-        l_mos6551->m_regStatus &= ~C_FLAG_STATUS_TX_EMPTY;
-        l_mos6551->m_regTxBuffer = p_data;
-        l_returnValue = 0;
-    } else {
+    if((l_mos6551->m_regStatus & C_FLAG_STATUS_RX_FULL) != 0) {
         l_mos6551->m_regStatus |= C_FLAG_STATUS_OVERRUN;
         l_returnValue = 1;
+    } else {
+        l_mos6551->m_regStatus |= C_FLAG_STATUS_RX_FULL;
+        l_mos6551->m_regRxBuffer = p_data;
+        l_returnValue = 0;
     }
 
     return l_returnValue;
@@ -56,9 +56,9 @@ static int mos6551_receive(struct ts_serial *p_serial) {
     struct ts_mos6551 *l_mos6551 = (struct ts_mos6551 *)p_serial;
     int l_returnValue = -1;
 
-    if(l_mos6551->m_regStatus & C_FLAG_STATUS_RX_FULL) {
-        l_mos6551->m_regStatus &= ~C_FLAG_STATUS_RX_FULL;
-        l_returnValue = l_mos6551->m_regRxBuffer;
+    if((l_mos6551->m_regStatus & C_FLAG_STATUS_TX_EMPTY) == 0) {
+        l_mos6551->m_regStatus |= C_FLAG_STATUS_TX_EMPTY;
+        l_returnValue = l_mos6551->m_regTxBuffer;
     }
 
     return l_returnValue;
