@@ -11,10 +11,12 @@ void bb6502_init(
 
     ram32k_init(&p_machine->m_ram);
     rom32k_init(&p_machine->m_rom, p_rom, p_size);
+    mos6551_init(&p_machine->m_serial);
     busBB6502_init(
         &p_machine->m_bus,
         &p_machine->m_rom,
-        &p_machine->m_ram
+        &p_machine->m_ram,
+        &p_machine->m_serial
     );
     nmos6502_init(&p_machine->m_cpu, &p_machine->m_bus.m_bus);
 }
