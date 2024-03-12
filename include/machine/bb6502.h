@@ -1,6 +1,7 @@
 #ifndef __INCLUDE_MACHINE_BB6502_H__
 #define __INCLUDE_MACHINE_BB6502_H__
 
+#include "commandline.h"
 #include "component/bus/busBB6502.h"
 #include "component/cpu/nmos6502.h"
 #include "component/ram/ram32k.h"
@@ -17,6 +18,8 @@ struct ts_bb6502 {
     struct ts_mos6551 m_serial;
 };
 
-void bb6502_init(struct ts_bb6502 *p_machine, const void *p_rom, size_t p_size);
+struct ts_bb6502 *bb6502_init(
+    struct ts_commandLineOptions *p_commandLineOptions
+);
 
 #endif
