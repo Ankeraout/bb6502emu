@@ -11,11 +11,11 @@ struct ts_ram32k {
 };
 
 void ram32k_init(struct ts_ram32k *p_ram);
-t_busData ram32k_read(struct ts_ram32k *p_ram, t_busAddress p_address);
-void ram32k_write(
+uint8_t ram32k_read8(struct ts_ram32k *p_ram, t_busAddress p_address);
+void ram32k_write8(
     struct ts_ram32k *p_ram,
     t_busAddress p_address,
-    t_busData p_data
+    uint8_t p_data
 );
 
 #endif

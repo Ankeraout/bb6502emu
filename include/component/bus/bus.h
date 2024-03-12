@@ -7,28 +7,27 @@ struct ts_bus;
 
 typedef uint16_t t_busAddress;
 typedef uint16_t t_busSize;
-typedef uint8_t t_busData;
 
 struct ts_bus {
-    t_busData (*m_read)(struct ts_bus *p_bus, t_busAddress p_address);
-    void (*m_write)(
+    uint8_t (*m_read8)(struct ts_bus *p_bus, t_busAddress p_address);
+    void (*m_write8)(
         struct ts_bus *p_bus,
         t_busAddress p_address,
-        t_busData p_data
+        uint8_t p_data
     );
     void (*m_cycle)(struct ts_bus *p_bus);
 };
 
-static inline t_busData busRead(struct ts_bus *p_bus, t_busAddress p_address) {
-    return p_bus->m_read(p_bus, p_address);
+static inline uint8_t busRead8(struct ts_bus *p_bus, t_busAddress p_address) {
+    return p_bus->m_read8(p_bus, p_address);
 }
 
-static inline void busWrite(
+static inline void busWrite8(
     struct ts_bus *p_bus,
     t_busAddress p_address,
-    t_busData p_data
+    uint8_t p_data
 ) {
-    p_bus->m_write(p_bus, p_address, p_data);
+    p_bus->m_write8(p_bus, p_address, p_data);
 }
 
 static inline void busCycle(struct ts_bus *p_bus) {

@@ -11,6 +11,6 @@ struct ts_rom32k {
 };
 
 void rom32k_init(struct ts_rom32k *p_rom, const void *p_buffer, size_t p_size);
-t_busData rom32k_read(struct ts_rom32k *p_rom, t_busAddress p_address);
+uint8_t rom32k_read(struct ts_rom32k *p_rom, t_busAddress p_address);
 
 #endif

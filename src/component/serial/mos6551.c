@@ -64,8 +64,8 @@ static int mos6551_receive(struct ts_serial *p_serial) {
     return l_returnValue;
 }
 
-t_busData mos6551_read(struct ts_mos6551 *p_mos6551, t_busAddress p_address) {
-    t_busData l_returnValue = 0xff;
+uint8_t mos6551_read8(struct ts_mos6551 *p_mos6551, t_busAddress p_address) {
+    uint8_t l_returnValue = 0xff;
     
     switch(p_address & 0x3) {
         case E_MOS6551_REGISTER_DATA:
@@ -93,10 +93,10 @@ t_busData mos6551_read(struct ts_mos6551 *p_mos6551, t_busAddress p_address) {
     return l_returnValue;
 }
 
-void mos6551_write(
+void mos6551_write8(
     struct ts_mos6551 *p_mos6551,
     t_busAddress p_address,
-    t_busData p_data
+    uint8_t p_data
 ) {
     switch(p_address & 0x3) {
         case E_MOS6551_REGISTER_DATA:

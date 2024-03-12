@@ -13,6 +13,6 @@ void rom32k_init(struct ts_rom32k *p_rom, const void *p_buffer, size_t p_size) {
     memset(&p_rom->m_data[l_copySize], 0, 32768 - l_copySize);
 }
 
-t_busData rom32k_read(struct ts_rom32k *p_rom, t_busAddress p_address) {
+uint8_t rom32k_read(struct ts_rom32k *p_rom, t_busAddress p_address) {
     return p_rom->m_data[p_address & 0x7fff];
 }

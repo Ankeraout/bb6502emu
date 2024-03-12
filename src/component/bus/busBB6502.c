@@ -1,11 +1,11 @@
 #include "component/bus/busBB6502.h"
 
 static void busBB6502_cycle(struct ts_bus *p_bus);
-static t_busData busBB6502_read(struct ts_bus *p_bus, t_busAddress p_address);
-static void busBB6502_write(
+static uint8_t busBB6502_read8(struct ts_bus *p_bus, t_busAddress p_address);
+static void busBB6502_write8(
     struct ts_bus *p_bus,
     t_busAddress p_address,
-    t_busData p_data
+    uint8_t p_data
 );
 
 void busBB6502_init(
@@ -15,8 +15,8 @@ void busBB6502_init(
     struct ts_mos6551 *p_serial
 ) {
     p_bus->m_bus.m_cycle = busBB6502_cycle;
-    p_bus->m_bus.m_read = busBB6502_read;
-    p_bus->m_bus.m_write = busBB6502_write;
+    p_bus->m_bus.m_read8 = busBB6502_read8;
+    p_bus->m_bus.m_write8 = busBB6502_write8;
 
     p_bus->m_rom = p_rom;
     p_bus->m_ram = p_ram;
@@ -29,16 +29,16 @@ static void busBB6502_cycle(struct ts_bus *p_bus) {
 }
 
 
-static t_busData busBB6502_read(struct ts_bus *p_bus, t_busAddress p_address) {
+static uint8_t busBB6502_read8(struct ts_bus *p_bus, t_busAddress p_address) {
     struct ts_busBB6502 *l_bus = (struct ts_busBB6502 *)p_bus;
 
     uint8_t l_returnValue;
     
     if((p_address & (1 << 15)) == 0) {
         if((p_address & 0xfffc) == 0x5000) {
-            l_returnValue = mos6551_read(l_bus->m_serial, p_address);
+            l_returnValue = mos6551_read8(l_bus->m_serial, p_address);
         } else {
-            l_returnValue = ram32k_read(l_bus->m_ram, p_address);
+            l_returnValue = ram32k_read8(l_bus->m_ram, p_address);
         }
     } else {
         l_returnValue = rom32k_read(l_bus->m_rom, p_address);
@@ -49,18 +49,18 @@ static t_busData busBB6502_read(struct ts_bus *p_bus, t_busAddress p_address) {
     return l_returnValue;
 }
 
-static void busBB6502_write(
+static void busBB6502_write8(
     struct ts_bus *p_bus,
     t_busAddress p_address,
-    t_busData p_data
+    uint8_t p_data
 ) {
     struct ts_busBB6502 *l_bus = (struct ts_busBB6502 *)p_bus;
 
     if((p_address & (1 << 15)) == 0) {
         if((p_address & 0xfffc) == 0x5000) {
-            mos6551_write(l_bus->m_serial, p_address, p_data);
+            mos6551_write8(l_bus->m_serial, p_address, p_data);
         } else {
-            ram32k_write(l_bus->m_ram, p_address, p_data);
+            ram32k_write8(l_bus->m_ram, p_address, p_data);
         }
     }
 

@@ -183,7 +183,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x02: // LD (BC), A
-            l_lr35902->m_bus->m_write(
+            l_lr35902->m_bus->m_write8(
                 l_lr35902->m_bus,
                 lr35902_getBC(l_lr35902),
                 l_lr35902->m_regA
@@ -228,7 +228,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x0a: // LD A, (BC)
             l_lr35902->m_regA =
-                busRead(l_lr35902->m_bus, lr35902_getBC(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getBC(l_lr35902));
             break;
 
         case 0x0b: // DEC BC
@@ -265,7 +265,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x12: // LD (DE), A
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getDE(l_lr35902),
                 l_lr35902->m_regA
@@ -306,7 +306,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x1a: // LD A, (DE)
             l_lr35902->m_regA =
-                busRead(l_lr35902->m_bus, lr35902_getDE(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getDE(l_lr35902));
             break;
 
         case 0x1b: // DEC DE
@@ -342,7 +342,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x22: // LD (HL+), A
             l_tmpAddress = lr35902_getHL(l_lr35902);
-            busWrite(l_lr35902->m_bus, l_tmpAddress, l_lr35902->m_regA);
+            busWrite8(l_lr35902->m_bus, l_tmpAddress, l_lr35902->m_regA);
             lr35902_setHL(l_lr35902, l_tmpAddress + 1);
             break;
 
@@ -399,7 +399,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x2a: // LD A, (HL+)
             l_tmpAddress = lr35902_getHL(l_lr35902);
-            l_lr35902->m_regA = busRead(l_lr35902->m_bus, l_tmpAddress);
+            l_lr35902->m_regA = busRead8(l_lr35902->m_bus, l_tmpAddress);
             lr35902_setHL(l_lr35902, l_tmpAddress + 1);
             break;
 
@@ -437,7 +437,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x32: // LD (HL-), A
             l_tmpAddress = lr35902_getHL(l_lr35902);
-            busWrite(l_lr35902->m_bus, l_tmpAddress, l_lr35902->m_regA);
+            busWrite8(l_lr35902->m_bus, l_tmpAddress, l_lr35902->m_regA);
             lr35902_setHL(l_lr35902, l_tmpAddress - 1);
             break;
 
@@ -447,22 +447,22 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x34: // INC (HL)
             l_tmpAddress = lr35902_getHL(l_lr35902);
-            l_tmpData = busRead(l_lr35902->m_bus, l_tmpAddress);
+            l_tmpData = busRead8(l_lr35902->m_bus, l_tmpAddress);
             l_tmpData = lr35902_opcodeInc8(l_lr35902, l_tmpData);
-            busWrite(l_lr35902->m_bus, l_tmpAddress, l_tmpData);
+            busWrite8(l_lr35902->m_bus, l_tmpAddress, l_tmpData);
             break;
 
         case 0x35: // DEC (HL)
             l_tmpAddress = lr35902_getHL(l_lr35902);
-            l_tmpData = busRead(l_lr35902->m_bus, l_tmpAddress);
+            l_tmpData = busRead8(l_lr35902->m_bus, l_tmpAddress);
             l_tmpData = lr35902_opcodeDec8(l_lr35902, l_tmpData);
-            busWrite(l_lr35902->m_bus, l_tmpAddress, l_tmpData);
+            busWrite8(l_lr35902->m_bus, l_tmpAddress, l_tmpData);
             break;
 
         case 0x36: // LD (HL), d8
             l_tmpAddress = lr35902_getHL(l_lr35902);
             l_tmpData = lr35902_fetch8(l_lr35902);
-            busWrite(l_lr35902->m_bus, l_tmpAddress, l_tmpData);
+            busWrite8(l_lr35902->m_bus, l_tmpAddress, l_tmpData);
             break;
 
         case 0x37: // SCF
@@ -481,7 +481,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x3a: // LD A, (HL-)
             l_tmpAddress = lr35902_getHL(l_lr35902);
-            l_lr35902->m_regA = busRead(l_lr35902->m_bus, l_tmpAddress);
+            l_lr35902->m_regA = busRead8(l_lr35902->m_bus, l_tmpAddress);
             lr35902_setHL(l_lr35902, l_tmpAddress - 1);
             break;
 
@@ -534,7 +534,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x46: // LD B, (HL)
             l_lr35902->m_regB =
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
             break;
 
         case 0x47: // LD B, A
@@ -566,7 +566,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x4e: // LD C, (HL)
             l_lr35902->m_regC =
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
             break;
 
         case 0x4f: // LD C, A
@@ -598,7 +598,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x56: // LD D, (HL)
             l_lr35902->m_regD =
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
             break;
 
         case 0x57: // LD D, A
@@ -630,7 +630,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x5e: // LD E, (HL)
             l_lr35902->m_regE =
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
             break;
 
         case 0x5f: // LD E, A
@@ -662,7 +662,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x66: // LD H, (HL)
             l_lr35902->m_regH =
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
             break;
 
         case 0x67: // LD H, A
@@ -694,7 +694,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x6e: // LD L, (HL)
             l_lr35902->m_regL =
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
             break;
 
         case 0x6f: // LD L, A
@@ -702,7 +702,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x70: // LD (HL), B
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getHL(l_lr35902),
                 l_lr35902->m_regB
@@ -710,7 +710,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x71: // LD (HL), C
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getHL(l_lr35902),
                 l_lr35902->m_regC
@@ -718,7 +718,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x72: // LD (HL), D
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getHL(l_lr35902),
                 l_lr35902->m_regD
@@ -726,7 +726,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x73: // LD (HL), E
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getHL(l_lr35902),
                 l_lr35902->m_regE
@@ -734,7 +734,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x74: // LD (HL), H
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getHL(l_lr35902),
                 l_lr35902->m_regH
@@ -742,7 +742,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x75: // LD (HL), L
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getHL(l_lr35902),
                 l_lr35902->m_regL
@@ -754,7 +754,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0x77: // LD (HL), A
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_getHL(l_lr35902),
                 l_lr35902->m_regA
@@ -787,7 +787,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0x7e: // LD A, (HL)
             l_lr35902->m_regA =
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902));
             break;
 
         case 0x7f: // LD A, A
@@ -820,7 +820,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0x86: // ADD A, (HL)
             lr35902_opcodeAdd8(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -855,7 +855,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0x8e: // ADC A, (HL)
             lr35902_opcodeAdc8(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -890,7 +890,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0x96: // SUB A, (HL)
             lr35902_opcodeSub8(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -925,7 +925,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0x9e: // SBC A, (HL)
             lr35902_opcodeSbc8(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -960,7 +960,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0xa6: // AND A, (HL)
             lr35902_opcodeAnd8(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -995,7 +995,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0xae: // XOR A, (HL)
             lr35902_opcodeXor8(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -1030,7 +1030,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0xb6: // OR A, (HL)
             lr35902_opcodeOr8(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -1065,7 +1065,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
         case 0xbe: // CP A, (HL)
             lr35902_opcodeCp(
                 l_lr35902,
-                busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
             );
             break;
 
@@ -1171,9 +1171,9 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
                 case 0x06: // RLC (HL)
                     l_tmpData = lr35902_opcodeRlcBase(
                         l_lr35902,
-                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                        busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
                     );
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         lr35902_getHL(l_lr35902),
                         l_tmpData
@@ -1240,9 +1240,9 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
                 case 0x0e: // RRC (HL)
                     l_tmpData = lr35902_opcodeRrcBase(
                         l_lr35902,
-                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                        busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
                     );
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         lr35902_getHL(l_lr35902),
                         l_tmpData
@@ -1309,9 +1309,9 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
                 case 0x16: // RL (HL)
                     l_tmpData = lr35902_opcodeRlBase(
                         l_lr35902,
-                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                        busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
                     );
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         lr35902_getHL(l_lr35902),
                         l_tmpData
@@ -1378,9 +1378,9 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
                 case 0x1e: // RR (HL)
                     l_tmpData = lr35902_opcodeRrBase(
                         l_lr35902,
-                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                        busRead8(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
                     );
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         lr35902_getHL(l_lr35902),
                         l_tmpData
@@ -1429,12 +1429,12 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
                 case 0x26: // SLA (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
 
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         l_tmpAddress,
                         lr35902_opcodeSla(
                             l_lr35902,
-                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                            busRead8(l_lr35902->m_bus, l_tmpAddress)
                         )
                     );
                     break;
@@ -1477,12 +1477,12 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
                 case 0x2e: // SRA (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
 
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         l_tmpAddress,
                         lr35902_opcodeSra(
                             l_lr35902,
-                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                            busRead8(l_lr35902->m_bus, l_tmpAddress)
                         )
                     );
                     break;
@@ -1524,12 +1524,12 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x36: // SWAP (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         l_tmpAddress,
                         lr35902_opcodeSwap(
                             l_lr35902,
-                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                            busRead8(l_lr35902->m_bus, l_tmpAddress)
                         )
                     );
                     break;
@@ -1572,12 +1572,12 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
                 case 0x3e: // SRL (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
 
-                    busWrite(
+                    busWrite8(
                         l_lr35902->m_bus,
                         l_tmpAddress,
                         lr35902_opcodeSrl(
                             l_lr35902,
-                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                            busRead8(l_lr35902->m_bus, l_tmpAddress)
                         )
                     );
                     break;
@@ -1631,7 +1631,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x46: // BIT 0, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 0)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 0)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -1687,7 +1687,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x4e: // BIT 1, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 1)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 1)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -1743,7 +1743,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x56: // BIT 2, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 2)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 2)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -1799,7 +1799,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x5e: // BIT 3, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 3)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 3)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -1855,7 +1855,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x66: // BIT 4, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 4)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 4)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -1911,7 +1911,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x6e: // BIT 5, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 5)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 5)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -1967,7 +1967,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x76: // BIT 6, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 6)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 6)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -2023,7 +2023,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x7e: // BIT 7, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 7)) == 0;
+                    l_lr35902->m_flagZ = (busRead8(l_lr35902->m_bus, l_tmpAddress) & (1 << 7)) == 0;
                     l_lr35902->m_flagN = false;
                     l_lr35902->m_flagH = true;
                     break;
@@ -2067,7 +2067,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x86: // RES 0, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 0));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 0));
                     break;
 
                 case 0x87: // RES 0, A
@@ -2107,7 +2107,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x8e: // RES 1, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 1));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 1));
                     break;
 
                 case 0x8f: // RES 1, A
@@ -2147,7 +2147,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x96: // RES 2, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 2));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 2));
                     break;
 
                 case 0x97: // RES 2, A
@@ -2187,7 +2187,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0x9e: // RES 3, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 3));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 3));
                     break;
 
                 case 0x9f: // RES 3, A
@@ -2227,7 +2227,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xa6: // RES 4, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 4));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 4));
                     break;
 
                 case 0xa7: // RES 4, A
@@ -2267,7 +2267,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xae: // RES 5, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 5));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 5));
                     break;
 
                 case 0xaf: // RES 5, A
@@ -2307,7 +2307,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xb6: // RES 6, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 6));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 6));
                     break;
 
                 case 0xb7: // RES 6, A
@@ -2347,7 +2347,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xbe: // RES 7, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 7));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 7));
                     break;
 
                 case 0xbf: // RES 7, A
@@ -2387,7 +2387,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xc6: // SET 0, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 0));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 0));
                     break;
 
                 case 0xc7: // SET 0, A
@@ -2427,7 +2427,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xce: // SET 1, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 1));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 1));
                     break;
 
                 case 0xcf: // SET 1, A
@@ -2467,7 +2467,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xd6: // SET 2, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 2));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 2));
                     break;
 
                 case 0xd7: // SET 2, A
@@ -2507,7 +2507,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xde: // SET 3, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 3));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 3));
                     break;
 
                 case 0xdf: // SET 3, A
@@ -2547,7 +2547,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xe6: // SET 4, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 4));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 4));
                     break;
 
                 case 0xe7: // SET 4, A
@@ -2587,7 +2587,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xee: // SET 5, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 5));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 5));
                     break;
 
                 case 0xef: // SET 5, A
@@ -2627,7 +2627,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xf6: // SET 6, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 6));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 6));
                     break;
 
                 case 0xf7: // SET 6, A
@@ -2667,7 +2667,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
                 case 0xfe: // SET 7, (HL)
                     l_tmpAddress = lr35902_getHL(l_lr35902);
-                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 7));
+                    busWrite8(l_lr35902->m_bus, l_tmpAddress, busRead8(l_lr35902->m_bus, l_tmpAddress) | (1 << 7));
                     break;
 
                 case 0xff: // SET 7, A
@@ -2749,7 +2749,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0xe0: // LDH (a8), A
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 0xff00 | lr35902_fetch8(l_lr35902),
                 l_lr35902->m_regA
@@ -2761,7 +2761,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0xe2: // LDH (C), A
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 0xff00 | l_lr35902->m_regC,
                 l_lr35902->m_regA
@@ -2801,7 +2801,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0xea: // LD (a16), A
-            busWrite(
+            busWrite8(
                 l_lr35902->m_bus,
                 lr35902_fetch16(l_lr35902),
                 l_lr35902->m_regA
@@ -2817,7 +2817,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0xf0: // LDH A, (a8)
-            l_lr35902->m_regA = busRead(
+            l_lr35902->m_regA = busRead8(
                 l_lr35902->m_bus,
                 0xff00 | lr35902_fetch8(l_lr35902)
             );
@@ -2828,7 +2828,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0xf2: // LDH A, (C)
-            l_lr35902->m_regA = busRead(
+            l_lr35902->m_regA = busRead8(
                 l_lr35902->m_bus,
                 0xff00 | lr35902_fetch8(l_lr35902)
             );
@@ -2874,7 +2874,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
             break;
 
         case 0xfa: // LD A, (a16)
-            l_lr35902->m_regA = busRead(
+            l_lr35902->m_regA = busRead8(
                 l_lr35902->m_bus,
                 lr35902_fetch16(l_lr35902)
             );
@@ -2895,7 +2895,7 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 }
 
 static uint8_t lr35902_fetch8(struct ts_lr35902 *p_lr35902) {
-    return p_lr35902->m_bus->m_read(p_lr35902->m_bus, p_lr35902->m_regPC++);
+    return p_lr35902->m_bus->m_read8(p_lr35902->m_bus, p_lr35902->m_regPC++);
 }
 
 static uint16_t lr35902_fetch16(struct ts_lr35902 *p_lr35902) {
@@ -2910,8 +2910,8 @@ static inline void lr35902_write16(
     uint16_t p_address,
     uint16_t p_data
 ) {
-    p_lr35902->m_bus->m_write(p_lr35902->m_bus, p_address, p_data);
-    p_lr35902->m_bus->m_write(p_lr35902->m_bus, p_address + 1, p_data >> 8);
+    p_lr35902->m_bus->m_write8(p_lr35902->m_bus, p_address, p_data);
+    p_lr35902->m_bus->m_write8(p_lr35902->m_bus, p_address + 1, p_data >> 8);
 }
 
 static inline uint16_t lr35902_getAF(struct ts_lr35902 *p_lr35902) {
@@ -3144,8 +3144,8 @@ static inline void lr35902_opcodeOr8(
 }
 
 static inline uint16_t lr35902_opcodePop(struct ts_lr35902 *p_lr35902) {
-    uint16_t l_result = busRead(p_lr35902->m_bus, p_lr35902->m_regSP++);
-    l_result |= busRead(p_lr35902->m_bus, p_lr35902->m_regSP++) << 8;
+    uint16_t l_result = busRead8(p_lr35902->m_bus, p_lr35902->m_regSP++);
+    l_result |= busRead8(p_lr35902->m_bus, p_lr35902->m_regSP++) << 8;
 
     return l_result;
 }
@@ -3155,8 +3155,8 @@ static inline void lr35902_opcodePush(
     uint16_t p_value
 ) {
     busCycle(p_lr35902->m_bus);
-    busWrite(p_lr35902->m_bus, --p_lr35902->m_regSP, p_value >> 8);
-    busWrite(p_lr35902->m_bus, p_lr35902->m_regSP, p_value);
+    busWrite8(p_lr35902->m_bus, --p_lr35902->m_regSP, p_value >> 8);
+    busWrite8(p_lr35902->m_bus, p_lr35902->m_regSP, p_value);
 }
 
 static inline void lr35902_opcodeRetCondition(

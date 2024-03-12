@@ -18,11 +18,11 @@ struct ts_mos6551 {
 };
 
 int mos6551_init(struct ts_mos6551 *p_mos6551);
-t_busData mos6551_read(struct ts_mos6551 *p_mos6551, t_busAddress p_address);
-void mos6551_write(
+uint8_t mos6551_read8(struct ts_mos6551 *p_mos6551, t_busAddress p_address);
+void mos6551_write8(
     struct ts_mos6551 *p_mos6551,
     t_busAddress p_address,
-    t_busData p_data
+    uint8_t p_data
 );
 
 #endif
