@@ -114,7 +114,23 @@ static inline void lr35902_opcodeSbc8(
     struct ts_lr35902 *p_lr35902,
     uint8_t p_value
 );
+static inline uint8_t lr35902_opcodeSla(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+);
+static inline uint8_t lr35902_opcodeSra(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+);
+static inline uint8_t lr35902_opcodeSrl(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+);
 static inline void lr35902_opcodeSub8(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+);
+static inline uint8_t lr35902_opcodeSwap(
     struct ts_lr35902 *p_lr35902,
     uint8_t p_value
 );
@@ -1104,7 +1120,1560 @@ static void lr35902_step(struct ts_cpu *p_cpu) {
 
         case 0xcb: // CB prefix
             switch(lr35902_fetch8(l_lr35902)) {
-                
+                case 0x00: // RLC B
+                    l_lr35902->m_regB = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        l_lr35902->m_regB
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regB == 0;
+                    break;
+
+                case 0x01: // RLC C
+                    l_lr35902->m_regC = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        l_lr35902->m_regC
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regC == 0;
+                    break;
+
+                case 0x02: // RLC D
+                    l_lr35902->m_regD = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        l_lr35902->m_regD
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regD == 0;
+                    break;
+
+                case 0x03: // RLC E
+                    l_lr35902->m_regE = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        l_lr35902->m_regE
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regE == 0;
+                    break;
+
+                case 0x04: // RLC H
+                    l_lr35902->m_regH = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        l_lr35902->m_regH
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regH == 0;
+                    break;
+
+                case 0x05: // RLC L
+                    l_lr35902->m_regL = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        l_lr35902->m_regL
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regL == 0;
+                    break;
+
+                case 0x06: // RLC (HL)
+                    l_tmpData = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                    );
+                    busWrite(
+                        l_lr35902->m_bus,
+                        lr35902_getHL(l_lr35902),
+                        l_tmpData
+                    );
+                    l_lr35902->m_flagZ = l_tmpData == 0;
+                    break;
+
+                case 0x07: // RLC A
+                    l_lr35902->m_regA = lr35902_opcodeRlcBase(
+                        l_lr35902,
+                        l_lr35902->m_regA
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regA == 0;
+                    break;
+
+                case 0x08: // RRC B
+                    l_lr35902->m_regB = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        l_lr35902->m_regB
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regB == 0;
+                    break;
+
+                case 0x09: // RRC C
+                    l_lr35902->m_regC = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        l_lr35902->m_regC
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regC == 0;
+                    break;
+
+                case 0x0a: // RRC D
+                    l_lr35902->m_regD = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        l_lr35902->m_regD
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regD == 0;
+                    break;
+
+                case 0x0b: // RRC E
+                    l_lr35902->m_regE = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        l_lr35902->m_regE
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regE == 0;
+                    break;
+
+                case 0x0c: // RRC H
+                    l_lr35902->m_regH = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        l_lr35902->m_regH
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regH == 0;
+                    break;
+
+                case 0x0d: // RRC L
+                    l_lr35902->m_regL = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        l_lr35902->m_regL
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regL == 0;
+                    break;
+
+                case 0x0e: // RRC (HL)
+                    l_tmpData = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                    );
+                    busWrite(
+                        l_lr35902->m_bus,
+                        lr35902_getHL(l_lr35902),
+                        l_tmpData
+                    );
+                    l_lr35902->m_flagZ = l_tmpData == 0;
+                    break;
+
+                case 0x0f: // RRC A
+                    l_lr35902->m_regA = lr35902_opcodeRrcBase(
+                        l_lr35902,
+                        l_lr35902->m_regA
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regA == 0;
+                    break;
+
+                case 0x10: // RL B
+                    l_lr35902->m_regB = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        l_lr35902->m_regB
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regB == 0;
+                    break;
+
+                case 0x11: // RL C
+                    l_lr35902->m_regC = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        l_lr35902->m_regC
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regC == 0;
+                    break;
+
+                case 0x12: // RL D
+                    l_lr35902->m_regD = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        l_lr35902->m_regD
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regD == 0;
+                    break;
+
+                case 0x13: // RL E
+                    l_lr35902->m_regE = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        l_lr35902->m_regE
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regE == 0;
+                    break;
+
+                case 0x14: // RL H
+                    l_lr35902->m_regH = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        l_lr35902->m_regH
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regH == 0;
+                    break;
+
+                case 0x15: // RL L
+                    l_lr35902->m_regL = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        l_lr35902->m_regL
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regL == 0;
+                    break;
+
+                case 0x16: // RL (HL)
+                    l_tmpData = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                    );
+                    busWrite(
+                        l_lr35902->m_bus,
+                        lr35902_getHL(l_lr35902),
+                        l_tmpData
+                    );
+                    l_lr35902->m_flagZ = l_tmpData == 0;
+                    break;
+
+                case 0x17: // RL A
+                    l_lr35902->m_regA = lr35902_opcodeRlBase(
+                        l_lr35902,
+                        l_lr35902->m_regA
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regA == 0;
+                    break;
+
+                case 0x18: // RR B
+                    l_lr35902->m_regB = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        l_lr35902->m_regB
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regB == 0;
+                    break;
+
+                case 0x19: // RR C
+                    l_lr35902->m_regC = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        l_lr35902->m_regC
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regC == 0;
+                    break;
+
+                case 0x1a: // RR D
+                    l_lr35902->m_regD = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        l_lr35902->m_regD
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regD == 0;
+                    break;
+
+                case 0x1b: // RR E
+                    l_lr35902->m_regE = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        l_lr35902->m_regE
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regE == 0;
+                    break;
+
+                case 0x1c: // RR H
+                    l_lr35902->m_regH = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        l_lr35902->m_regH
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regH == 0;
+                    break;
+
+                case 0x1d: // RR L
+                    l_lr35902->m_regL = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        l_lr35902->m_regL
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regL == 0;
+                    break;
+
+                case 0x1e: // RR (HL)
+                    l_tmpData = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        busRead(l_lr35902->m_bus, lr35902_getHL(l_lr35902))
+                    );
+                    busWrite(
+                        l_lr35902->m_bus,
+                        lr35902_getHL(l_lr35902),
+                        l_tmpData
+                    );
+                    l_lr35902->m_flagZ = l_tmpData == 0;
+                    break;
+
+                case 0x1f: // RR A
+                    l_lr35902->m_regA = lr35902_opcodeRrBase(
+                        l_lr35902,
+                        l_lr35902->m_regA
+                    );
+                    l_lr35902->m_flagZ = l_lr35902->m_regA == 0;
+                    break;
+
+                case 0x20: // SLA B
+                    l_lr35902->m_regB =
+                        lr35902_opcodeSla(l_lr35902, l_lr35902->m_regB);
+                    break;
+
+                case 0x21: // SLA C
+                    l_lr35902->m_regC =
+                        lr35902_opcodeSla(l_lr35902, l_lr35902->m_regC);
+                    break;
+
+                case 0x22: // SLA D
+                    l_lr35902->m_regD =
+                        lr35902_opcodeSla(l_lr35902, l_lr35902->m_regD);
+                    break;
+
+                case 0x23: // SLA E
+                    l_lr35902->m_regE =
+                        lr35902_opcodeSla(l_lr35902, l_lr35902->m_regE);
+                    break;
+
+                case 0x24: // SLA H
+                    l_lr35902->m_regH =
+                        lr35902_opcodeSla(l_lr35902, l_lr35902->m_regH);
+                    break;
+
+                case 0x25: // SLA L
+                    l_lr35902->m_regL =
+                        lr35902_opcodeSla(l_lr35902, l_lr35902->m_regL);
+                    break;
+
+                case 0x26: // SLA (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+
+                    busWrite(
+                        l_lr35902->m_bus,
+                        l_tmpAddress,
+                        lr35902_opcodeSla(
+                            l_lr35902,
+                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                        )
+                    );
+                    break;
+
+                case 0x27: // SLA A
+                    l_lr35902->m_regA =
+                        lr35902_opcodeSla(l_lr35902, l_lr35902->m_regA);
+                    break;
+
+                case 0x28: // SRA B
+                    l_lr35902->m_regB =
+                        lr35902_opcodeSra(l_lr35902, l_lr35902->m_regB);
+                    break;
+
+                case 0x29: // SRA C
+                    l_lr35902->m_regC =
+                        lr35902_opcodeSra(l_lr35902, l_lr35902->m_regC);
+                    break;
+
+                case 0x2a: // SRA D
+                    l_lr35902->m_regD =
+                        lr35902_opcodeSra(l_lr35902, l_lr35902->m_regD);
+                    break;
+
+                case 0x2b: // SRA E
+                    l_lr35902->m_regE =
+                        lr35902_opcodeSra(l_lr35902, l_lr35902->m_regE);
+                    break;
+
+                case 0x2c: // SRA H
+                    l_lr35902->m_regH =
+                        lr35902_opcodeSra(l_lr35902, l_lr35902->m_regH);
+                    break;
+
+                case 0x2d: // SRA L
+                    l_lr35902->m_regL =
+                        lr35902_opcodeSra(l_lr35902, l_lr35902->m_regL);
+                    break;
+
+                case 0x2e: // SRA (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+
+                    busWrite(
+                        l_lr35902->m_bus,
+                        l_tmpAddress,
+                        lr35902_opcodeSra(
+                            l_lr35902,
+                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                        )
+                    );
+                    break;
+
+                case 0x2f: // SRA A
+                    l_lr35902->m_regA =
+                        lr35902_opcodeSra(l_lr35902, l_lr35902->m_regA);
+                    break;
+
+                case 0x30: // SWAP B
+                    l_lr35902->m_regB =
+                        lr35902_opcodeSwap(l_lr35902, l_lr35902->m_regB);
+                    break;
+
+                case 0x31: // SWAP C
+                    l_lr35902->m_regC =
+                        lr35902_opcodeSwap(l_lr35902, l_lr35902->m_regC);
+                    break;
+
+                case 0x32: // SWAP D
+                    l_lr35902->m_regD =
+                        lr35902_opcodeSwap(l_lr35902, l_lr35902->m_regD);
+                    break;
+
+                case 0x33: // SWAP E
+                    l_lr35902->m_regE =
+                        lr35902_opcodeSwap(l_lr35902, l_lr35902->m_regE);
+                    break;
+
+                case 0x34: // SWAP H
+                    l_lr35902->m_regH =
+                        lr35902_opcodeSwap(l_lr35902, l_lr35902->m_regH);
+                    break;
+
+                case 0x35: // SWAP L
+                    l_lr35902->m_regL =
+                        lr35902_opcodeSwap(l_lr35902, l_lr35902->m_regL);
+                    break;
+
+                case 0x36: // SWAP (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(
+                        l_lr35902->m_bus,
+                        l_tmpAddress,
+                        lr35902_opcodeSwap(
+                            l_lr35902,
+                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                        )
+                    );
+                    break;
+
+                case 0x37: // SWAP A
+                    l_lr35902->m_regA =
+                        lr35902_opcodeSwap(l_lr35902, l_lr35902->m_regA);
+                    break;
+
+                case 0x38: // SRL B
+                    l_lr35902->m_regB =
+                        lr35902_opcodeSrl(l_lr35902, l_lr35902->m_regB);
+                    break;
+
+                case 0x39: // SRL C
+                    l_lr35902->m_regC =
+                        lr35902_opcodeSrl(l_lr35902, l_lr35902->m_regC);
+                    break;
+
+                case 0x3a: // SRL D
+                    l_lr35902->m_regD =
+                        lr35902_opcodeSrl(l_lr35902, l_lr35902->m_regD);
+                    break;
+
+                case 0x3b: // SRL E
+                    l_lr35902->m_regE =
+                        lr35902_opcodeSrl(l_lr35902, l_lr35902->m_regE);
+                    break;
+
+                case 0x3c: // SRL H
+                    l_lr35902->m_regH =
+                        lr35902_opcodeSrl(l_lr35902, l_lr35902->m_regH);
+                    break;
+
+                case 0x3d: // SRL L
+                    l_lr35902->m_regL =
+                        lr35902_opcodeSrl(l_lr35902, l_lr35902->m_regL);
+                    break;
+
+                case 0x3e: // SRL (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+
+                    busWrite(
+                        l_lr35902->m_bus,
+                        l_tmpAddress,
+                        lr35902_opcodeSrl(
+                            l_lr35902,
+                            busRead(l_lr35902->m_bus, l_tmpAddress)
+                        )
+                    );
+                    break;
+
+                case 0x3f: // SRL A
+                    l_lr35902->m_regA =
+                        lr35902_opcodeSrl(l_lr35902, l_lr35902->m_regA);
+                    break;
+
+                case 0x40: // BIT 0, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x41: // BIT 0, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x42: // BIT 0, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x43: // BIT 0, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x44: // BIT 0, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x45: // BIT 0, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x46: // BIT 0, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x47: // BIT 0, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 0)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x48: // BIT 1, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x49: // BIT 1, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x4a: // BIT 1, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x4b: // BIT 1, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x4c: // BIT 1, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x4d: // BIT 1, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x4e: // BIT 1, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x4f: // BIT 1, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 1)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x50: // BIT 2, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x51: // BIT 2, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x52: // BIT 2, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x53: // BIT 2, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x54: // BIT 2, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x55: // BIT 2, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x56: // BIT 2, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x57: // BIT 2, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 2)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x58: // BIT 3, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x59: // BIT 3, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x5a: // BIT 3, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x5b: // BIT 3, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x5c: // BIT 3, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x5d: // BIT 3, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x5e: // BIT 3, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x5f: // BIT 3, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 3)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x60: // BIT 4, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x61: // BIT 4, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x62: // BIT 4, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x63: // BIT 4, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x64: // BIT 4, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x65: // BIT 4, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x66: // BIT 4, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x67: // BIT 4, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 4)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x68: // BIT 5, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x69: // BIT 5, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x6a: // BIT 5, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x6b: // BIT 5, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x6c: // BIT 5, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x6d: // BIT 5, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x6e: // BIT 5, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x6f: // BIT 5, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 5)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x70: // BIT 6, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x71: // BIT 6, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x72: // BIT 6, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x73: // BIT 6, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x74: // BIT 6, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x75: // BIT 6, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x76: // BIT 6, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x77: // BIT 6, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 6)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x78: // BIT 7, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regB & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x79: // BIT 7, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regC & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x7a: // BIT 7, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regD & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x7b: // BIT 7, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regE & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x7c: // BIT 7, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regH & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x7d: // BIT 7, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regL & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x7e: // BIT 7, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (busRead(l_lr35902->m_bus, l_tmpAddress) & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x7f: // BIT 7, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_flagZ = (l_lr35902->m_regA & (1 << 7)) == 0;
+                    l_lr35902->m_flagN = false;
+                    l_lr35902->m_flagH = true;
+                    break;
+
+                case 0x80: // RES 0, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 0);
+                    break;
+
+                case 0x81: // RES 0, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 0);
+                    break;
+
+                case 0x82: // RES 0, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 0);
+                    break;
+
+                case 0x83: // RES 0, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 0);
+                    break;
+
+                case 0x84: // RES 0, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 0);
+                    break;
+
+                case 0x85: // RES 0, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 0);
+                    break;
+
+                case 0x86: // RES 0, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 0));
+                    break;
+
+                case 0x87: // RES 0, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 0);
+                    break;
+
+                case 0x88: // RES 1, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 1);
+                    break;
+
+                case 0x89: // RES 1, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 1);
+                    break;
+
+                case 0x8a: // RES 1, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 1);
+                    break;
+
+                case 0x8b: // RES 1, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 1);
+                    break;
+
+                case 0x8c: // RES 1, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 1);
+                    break;
+
+                case 0x8d: // RES 1, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 1);
+                    break;
+
+                case 0x8e: // RES 1, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 1));
+                    break;
+
+                case 0x8f: // RES 1, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 1);
+                    break;
+
+                case 0x90: // RES 2, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 2);
+                    break;
+
+                case 0x91: // RES 2, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 2);
+                    break;
+
+                case 0x92: // RES 2, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 2);
+                    break;
+
+                case 0x93: // RES 2, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 2);
+                    break;
+
+                case 0x94: // RES 2, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 2);
+                    break;
+
+                case 0x95: // RES 2, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 2);
+                    break;
+
+                case 0x96: // RES 2, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 2));
+                    break;
+
+                case 0x97: // RES 2, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 2);
+                    break;
+
+                case 0x98: // RES 3, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 3);
+                    break;
+
+                case 0x99: // RES 3, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 3);
+                    break;
+
+                case 0x9a: // RES 3, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 3);
+                    break;
+
+                case 0x9b: // RES 3, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 3);
+                    break;
+
+                case 0x9c: // RES 3, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 3);
+                    break;
+
+                case 0x9d: // RES 3, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 3);
+                    break;
+
+                case 0x9e: // RES 3, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 3));
+                    break;
+
+                case 0x9f: // RES 3, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 3);
+                    break;
+
+                case 0xa0: // RES 4, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 4);
+                    break;
+
+                case 0xa1: // RES 4, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 4);
+                    break;
+
+                case 0xa2: // RES 4, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 4);
+                    break;
+
+                case 0xa3: // RES 4, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 4);
+                    break;
+
+                case 0xa4: // RES 4, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 4);
+                    break;
+
+                case 0xa5: // RES 4, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 4);
+                    break;
+
+                case 0xa6: // RES 4, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 4));
+                    break;
+
+                case 0xa7: // RES 4, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 4);
+                    break;
+
+                case 0xa8: // RES 5, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 5);
+                    break;
+
+                case 0xa9: // RES 5, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 5);
+                    break;
+
+                case 0xaa: // RES 5, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 5);
+                    break;
+
+                case 0xab: // RES 5, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 5);
+                    break;
+
+                case 0xac: // RES 5, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 5);
+                    break;
+
+                case 0xad: // RES 5, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 5);
+                    break;
+
+                case 0xae: // RES 5, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 5));
+                    break;
+
+                case 0xaf: // RES 5, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 5);
+                    break;
+
+                case 0xb0: // RES 6, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 6);
+                    break;
+
+                case 0xb1: // RES 6, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 6);
+                    break;
+
+                case 0xb2: // RES 6, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 6);
+                    break;
+
+                case 0xb3: // RES 6, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 6);
+                    break;
+
+                case 0xb4: // RES 6, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 6);
+                    break;
+
+                case 0xb5: // RES 6, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 6);
+                    break;
+
+                case 0xb6: // RES 6, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 6));
+                    break;
+
+                case 0xb7: // RES 6, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 6);
+                    break;
+
+                case 0xb8: // RES 7, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB & ~(1 << 7);
+                    break;
+
+                case 0xb9: // RES 7, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC & ~(1 << 7);
+                    break;
+
+                case 0xba: // RES 7, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD & ~(1 << 7);
+                    break;
+
+                case 0xbb: // RES 7, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE & ~(1 << 7);
+                    break;
+
+                case 0xbc: // RES 7, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH & ~(1 << 7);
+                    break;
+
+                case 0xbd: // RES 7, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL & ~(1 << 7);
+                    break;
+
+                case 0xbe: // RES 7, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) & ~(1 << 7));
+                    break;
+
+                case 0xbf: // RES 7, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA & ~(1 << 7);
+                    break;
+
+                case 0xc0: // SET 0, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 0);
+                    break;
+
+                case 0xc1: // SET 0, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 0);
+                    break;
+
+                case 0xc2: // SET 0, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 0);
+                    break;
+
+                case 0xc3: // SET 0, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 0);
+                    break;
+
+                case 0xc4: // SET 0, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 0);
+                    break;
+
+                case 0xc5: // SET 0, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 0);
+                    break;
+
+                case 0xc6: // SET 0, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 0));
+                    break;
+
+                case 0xc7: // SET 0, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 0);
+                    break;
+
+                case 0xc8: // SET 1, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 1);
+                    break;
+
+                case 0xc9: // SET 1, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 1);
+                    break;
+
+                case 0xca: // SET 1, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 1);
+                    break;
+
+                case 0xcb: // SET 1, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 1);
+                    break;
+
+                case 0xcc: // SET 1, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 1);
+                    break;
+
+                case 0xcd: // SET 1, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 1);
+                    break;
+
+                case 0xce: // SET 1, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 1));
+                    break;
+
+                case 0xcf: // SET 1, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 1);
+                    break;
+
+                case 0xd0: // SET 2, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 2);
+                    break;
+
+                case 0xd1: // SET 2, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 2);
+                    break;
+
+                case 0xd2: // SET 2, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 2);
+                    break;
+
+                case 0xd3: // SET 2, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 2);
+                    break;
+
+                case 0xd4: // SET 2, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 2);
+                    break;
+
+                case 0xd5: // SET 2, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 2);
+                    break;
+
+                case 0xd6: // SET 2, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 2));
+                    break;
+
+                case 0xd7: // SET 2, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 2);
+                    break;
+
+                case 0xd8: // SET 3, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 3);
+                    break;
+
+                case 0xd9: // SET 3, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 3);
+                    break;
+
+                case 0xda: // SET 3, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 3);
+                    break;
+
+                case 0xdb: // SET 3, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 3);
+                    break;
+
+                case 0xdc: // SET 3, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 3);
+                    break;
+
+                case 0xdd: // SET 3, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 3);
+                    break;
+
+                case 0xde: // SET 3, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 3));
+                    break;
+
+                case 0xdf: // SET 3, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 3);
+                    break;
+
+                case 0xe0: // SET 4, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 4);
+                    break;
+
+                case 0xe1: // SET 4, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 4);
+                    break;
+
+                case 0xe2: // SET 4, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 4);
+                    break;
+
+                case 0xe3: // SET 4, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 4);
+                    break;
+
+                case 0xe4: // SET 4, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 4);
+                    break;
+
+                case 0xe5: // SET 4, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 4);
+                    break;
+
+                case 0xe6: // SET 4, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 4));
+                    break;
+
+                case 0xe7: // SET 4, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 4);
+                    break;
+
+                case 0xe8: // SET 5, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 5);
+                    break;
+
+                case 0xe9: // SET 5, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 5);
+                    break;
+
+                case 0xea: // SET 5, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 5);
+                    break;
+
+                case 0xeb: // SET 5, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 5);
+                    break;
+
+                case 0xec: // SET 5, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 5);
+                    break;
+
+                case 0xed: // SET 5, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 5);
+                    break;
+
+                case 0xee: // SET 5, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 5));
+                    break;
+
+                case 0xef: // SET 5, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 5);
+                    break;
+
+                case 0xf0: // SET 6, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 6);
+                    break;
+
+                case 0xf1: // SET 6, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 6);
+                    break;
+
+                case 0xf2: // SET 6, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 6);
+                    break;
+
+                case 0xf3: // SET 6, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 6);
+                    break;
+
+                case 0xf4: // SET 6, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 6);
+                    break;
+
+                case 0xf5: // SET 6, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 6);
+                    break;
+
+                case 0xf6: // SET 6, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 6));
+                    break;
+
+                case 0xf7: // SET 6, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 6);
+                    break;
+
+                case 0xf8: // SET 7, B
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regB = l_lr35902->m_regB | (1 << 7);
+                    break;
+
+                case 0xf9: // SET 7, C
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regC = l_lr35902->m_regC | (1 << 7);
+                    break;
+
+                case 0xfa: // SET 7, D
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regD = l_lr35902->m_regD | (1 << 7);
+                    break;
+
+                case 0xfb: // SET 7, E
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regE = l_lr35902->m_regE | (1 << 7);
+                    break;
+
+                case 0xfc: // SET 7, H
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regH = l_lr35902->m_regH | (1 << 7);
+                    break;
+
+                case 0xfd: // SET 7, L
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regL = l_lr35902->m_regL | (1 << 7);
+                    break;
+
+                case 0xfe: // SET 7, (HL)
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    busWrite(l_lr35902->m_bus, l_tmpAddress, busRead(l_lr35902->m_bus, l_tmpAddress) | (1 << 7));
+                    break;
+
+                case 0xff: // SET 7, A
+                    l_tmpAddress = lr35902_getHL(l_lr35902);
+                    l_lr35902->m_regA = l_lr35902->m_regA | (1 << 7);
+                    break;
             }
 
             break;
@@ -1675,6 +3244,51 @@ static inline void lr35902_opcodeSbc8(
     p_lr35902->m_flagZ = p_lr35902->m_regA == 0;
 }
 
+static inline uint8_t lr35902_opcodeSla(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+) {
+    p_lr35902->m_flagH = false;
+    p_lr35902->m_flagN = false;
+    p_lr35902->m_flagC = (p_value & 0x80) != 0;
+
+    p_value <<= 1;
+
+    p_lr35902->m_flagZ = p_value == 0;
+
+    return p_value;
+}
+
+static inline uint8_t lr35902_opcodeSra(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+) {
+    p_lr35902->m_flagH = false;
+    p_lr35902->m_flagN = false;
+    p_lr35902->m_flagC = (p_value & 0x80) != 0;
+
+    p_value = ((int8_t)p_value) >> 1;
+
+    p_lr35902->m_flagZ = p_value == 0;
+
+    return p_value;
+}
+
+static inline uint8_t lr35902_opcodeSrl(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+) {
+    p_lr35902->m_flagH = false;
+    p_lr35902->m_flagN = false;
+    p_lr35902->m_flagC = (p_value & 0x80) != 0;
+
+    p_value = p_value >> 1;
+
+    p_lr35902->m_flagZ = p_value == 0;
+
+    return p_value;
+}
+
 static inline void lr35902_opcodeSub8(
     struct ts_lr35902 *p_lr35902,
     uint8_t p_value
@@ -1686,6 +3300,18 @@ static inline void lr35902_opcodeSub8(
     p_lr35902->m_regA -= p_value;
 
     p_lr35902->m_flagZ = p_lr35902->m_regA == 0;
+}
+
+static inline uint8_t lr35902_opcodeSwap(
+    struct ts_lr35902 *p_lr35902,
+    uint8_t p_value
+) {
+    p_lr35902->m_flagZ = p_value == 0;
+    p_lr35902->m_flagN = false;
+    p_lr35902->m_flagH = false;
+    p_lr35902->m_flagC = false;
+
+    return ((p_value & 0x0f) << 4) | (p_value >> 4);
 }
 
 static inline void lr35902_opcodeXor8(
