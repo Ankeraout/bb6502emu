@@ -18,7 +18,7 @@ int main(int p_argc, const char *p_argv[]) {
     printf("Machine initialized successfully.\n");
 
     while(true) {
-        l_machine->m_step(l_machine);
+        machineStep(l_machine);
     }
 
     return 0;

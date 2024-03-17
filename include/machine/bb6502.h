@@ -15,7 +15,8 @@ struct ts_bb6502 {
     struct ts_nmos6502 m_cpu;
     struct ts_ram32k m_ram;
     struct ts_rom32k m_rom;
-    struct ts_mos6551 m_serial;
+    struct ts_mos6551 m_mos6551;
+    struct ts_serial m_serial;
 };
 
 struct ts_bb6502 *bb6502_init(

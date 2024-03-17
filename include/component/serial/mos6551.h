@@ -7,7 +7,7 @@
 #include "component/serial/serial.h"
 
 struct ts_mos6551 {
-    struct ts_serial m_serial;
+    struct ts_serial *m_serial;
 
     // MOS6551 registers
     uint8_t m_regTxBuffer;
@@ -17,7 +17,7 @@ struct ts_mos6551 {
     uint8_t m_regControl;
 };
 
-int mos6551_init(struct ts_mos6551 *p_mos6551);
+int mos6551_init(struct ts_mos6551 *p_mos6551, struct ts_serial *p_serial);
 uint8_t mos6551_read8(struct ts_mos6551 *p_mos6551, t_busAddress p_address);
 void mos6551_write8(
     struct ts_mos6551 *p_mos6551,

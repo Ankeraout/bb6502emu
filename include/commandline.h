@@ -4,6 +4,7 @@
 struct ts_commandLineOptions {
     const char *m_machineName;
     const char *m_romFileName;
+    const char *m_serialMode;
 };
 
 int parseCommandLine(
